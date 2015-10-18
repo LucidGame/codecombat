@@ -48,7 +48,6 @@ module.exports = class SubscribeModal extends ModalView
     popoverTitle = $.i18n.t 'subscribe.parent_email_title'
     popoverTitle += '<button type="button" class="close" onclick="$(&#39;.parent-button&#39;).popover(&#39;hide&#39;);">&times;</button>'
     popoverContent = ->
-      console.log 'found html', $('.parent-button-popover-content').html()
       $('.parent-button-popover-content').html()
     @$el.find('.parent-button').popover(
       animation: true
@@ -126,7 +125,7 @@ module.exports = class SubscribeModal extends ModalView
     options = {
       description: $.i18n.t('subscribe.stripe_description')
       amount: @product.amount
-      alipay: if me.get('chinaVersion') or (me.get('preferredLanguage') or 'en-US')[...2] is 'zh' then true else 'auto'
+      alipay: if me.get('country') is 'china' or (me.get('preferredLanguage') or 'en-US')[...2] is 'zh' then true else 'auto'
       alipayReusable: true
     }
 
@@ -150,7 +149,7 @@ module.exports = class SubscribeModal extends ModalView
     options =
       description: $.i18n.t('subscribe.stripe_description_year_sale')
       amount: @product.yearAmount
-      alipay: if me.get('chinaVersion') or (me.get('preferredLanguage') or 'en-US')[...2] is 'zh' then true else 'auto'
+      alipay: if me.get('country') is 'china' or (me.get('preferredLanguage') or 'en-US')[...2] is 'zh' then true else 'auto'
       alipayReusable: true
     @purchasedAmount = options.amount
     stripeHandler.open(options)

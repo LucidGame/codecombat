@@ -200,7 +200,6 @@ UserSchema.statics.unconflictName = unconflictName = (name, done) ->
 
 UserSchema.methods.register = (done) ->
   @set('anonymous', false)
-  @set('permissions', ['admin']) if not isProduction and not GLOBAL.testing
   if (name = @get 'name')? and name isnt ''
     unconflictName name, (err, uniqueName) =>
       return done err if err
@@ -229,6 +228,9 @@ UserSchema.methods.isPremium = ->
   return true if @isAdmin()
   return true if @hasSubscription()
   return false
+
+UserSchema.methods.isOnPremiumServer = ->
+  @get('country') in ['china', 'brazil']
 
 UserSchema.methods.level = ->
   xp = @get('points') or 0
@@ -302,7 +304,7 @@ UserSchema.statics.hashPassword = (password) ->
 UserSchema.statics.privateProperties = [
   'permissions', 'email', 'mailChimp', 'firstName', 'lastName', 'gender', 'facebookID',
   'gplusID', 'music', 'volume', 'aceConfig', 'employerAt', 'signedEmployerAgreement',
-  'emailSubscriptions', 'emails', 'activity', 'stripe', 'stripeCustomerID', 'chinaVersion'
+  'emailSubscriptions', 'emails', 'activity', 'stripe', 'stripeCustomerID', 'chinaVersion', 'country'
 ]
 UserSchema.statics.jsonSchema = jsonschema
 UserSchema.statics.editableProperties = [

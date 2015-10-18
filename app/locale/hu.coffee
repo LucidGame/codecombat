@@ -31,6 +31,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     contact: "Kapcsolat"
     twitter_follow: "Követés"
     teachers: "Tanárok"
+#    careers: "Careers"
 
   modal:
     close: "Mégse"
@@ -136,7 +137,6 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     save: "Mentés"
     publish: "Publikálás"
     create: "Létrehozás"
-    manual: "Kézi"
     fork: "Villára vesz"
     play: "Játszd" # When used as an action verb, like "Play next level"
     retry: "Próbáld újra!"
@@ -159,10 +159,12 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     accepted: "Elfogadva"
     rejected: "Elutasítva"
     withdrawn: "Visszavon"
+#    accept: "Accept"
+#    reject: "Reject"
+#    withdraw: "Withdraw"
     submitter: "Beküldő"
     submitted: "Beküldött"
     commit_msg: "Üzenet feladása"
-    review: "Áttekintés"
     version_history: "Verzió történet"
     version_history_for: "Verzió története ennek: "
     select_changes: "Válassz két lehetőséget alul, hogy lásd a különbséget."
@@ -215,6 +217,8 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 
   play_level:
     done: "Kész"
+#    next_game: "Next game"
+#    show_menu: "Show game menu"
     home: "Kezdőlap" # Not used any more, will be removed soon.
     level: "Pálya" # Like "Level: Dungeons of Kithgard"
     skip: "Ugrás"
@@ -271,7 +275,6 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     tome_select_a_thang: "Válassz egy dolgot "
     tome_available_spells: "Elérhető varázslatok"
     tome_your_skills: "Képességeid"
-    tome_help: "Segítség"
     tome_current_method: "Aktuális módszer"
     hud_continue_short: "Folytatás"
     code_saved: "Kód mentve"
@@ -280,7 +283,6 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     loading_ready: "Kész!"
     loading_start: "Pálya kezdése"
     problem_alert_title: "Javítsd ki a Kódod"
-    problem_alert_help: "Segítség"
     time_current: "Most:"
     time_total: "Maximum:"
     time_goto: "Menj"
@@ -341,6 +343,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    tip_free_your_mind: "You have to let it all go, Neo. Fear, doubt, and disbelief. Free your mind. - Morpheus"
 #    tip_strong_opponents: "Even the strongest of opponents always has a weakness. - Itachi Uchiha"
 #    tip_paper_and_pen: "Before you start coding, you can always plan with a sheet of paper and a pen."
+#    solve_then_write: "First, solve the problem. Then, write the code. - John Johnson"
 
   game_menu:
     inventory_tab: "Raktár"
@@ -410,6 +413,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    feature7: "Private <strong>Clans</strong>"
     free: "Ingyenes"
     month: "hónap"
+#    must_be_logged: "You must be logged in first. Please create an account or log in from the menu above."
     subscribe_title: "Feliratkozás"
     unsubscribe: "Leiratkozás"
     confirm_unsubscribe: "Leiratkozás megerősítése"
@@ -439,7 +443,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    payment_methods_blurb2: "If you require an alternate form of payment, please contact"
 #    sale_already_subscribed: "You're already subscribed!"
 #    sale_blurb1: "Save 35%"
-#    sale_blurb2: "off regular subscription price of $120 for a whole year!" # {changed}
+#    sale_blurb2: "off regular subscription price of $120 for a whole year!"
 #    sale_button: "Sale!"
 #    sale_button_title: "Save 35% when you purchase a 1 year subscription"
 #    sale_click_here: "Click Here"
@@ -462,7 +466,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    managed_by: "Managed by"
 #    will_be_cancelled: "Will be cancelled on"
 #    currently_free: "You currently have a free subscription"
-#    currently_free_until: "You currently have a subscription until" # {changed}
+#    currently_free_until: "You currently have a subscription until"
 #    was_free_until: "You had a free subscription until"
 #    managed_subs: "Managed Subscriptions"
 #    managed_subs_desc: "Add subscriptions for other players (students, children, etc.)"
@@ -526,6 +530,8 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
   skill_docs:
     writable: "írható" # Hover over "attack" in Your Skills while playing a level to see most of this
     read_only: "csak olvasható"
+#    action: "Action"
+#    spell: "Spell"
     action_name: "név"
     action_cooldown: "Újratöltés"
     action_specific_cooldown: "Speciális újratöltés"
@@ -550,12 +556,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     volume_label: "Hangerő"
     music_label: "Zene"
     music_description: "Háttérzene ki/bekapcsolása"
-    editor_config: "Szerkesztő Config"
     editor_config_title: "Szerkesztő Beállítások"
-    editor_config_level_language_label: "Nyelv a szinthez"
-    editor_config_level_language_description: "Definiáld a programnyelvet ehhez a szinthez."
-    editor_config_default_language_label: "Programnyelv alapbeállítása"
-    editor_config_default_language_description: "Definiáld a programnyelvet, amin szeretnél kódolni, amikor új szintet kezdesz."
     editor_config_keybindings_label: "Gyors-billentyűk"
 #    editor_config_keybindings_default: "Default (Ace)"
 #    editor_config_keybindings_description: "Adds additional shortcuts known from the common editors."
@@ -606,10 +607,11 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     intro_1: "CodeCombat egy online játék, amelyik programozni tanít. A tanulók valódi programnyelven kódolnak."
     intro_2: "Előzetes tapasztalat nem szükséges!"
     free_title: "Mennyibe kerül?"
-    cost_china: "CodeCombat Kínában ingyenes az első 5 pályára, aztán $9.99 /hó, hogy elérhető legyen 120+ pálya az exkluzív kínai szervereken." # {change}
+#    cost_premium_server: "CodeCombat is free for the first five levels, after which it costs $9.99 USD per month for access to our other 190+ levels on our exclusive country-specific servers."
     free_1: "CodeCombat Basic INGYENES! 70-nél is több pálya, amely minden tudást megad." # {change}
     free_2: "A havidíjas előfizetés hozzáférést biztosít az oktató videókhoz és az extra gyakoroló pályákhoz."
     teacher_subs_title: "Tanárok ingyenes előfizetést kapnak!"
+#    teacher_subs_0: "We offer free subscriptions to teachers for evaluation purposes."
     teacher_subs_1: "Lépjen kapcsolatba velünk," # {change}
     teacher_subs_2: "hogy megkapja az ingyenes havi előfizetést." # {change}
 #    teacher_subs_3: "to set up your subscription."
@@ -634,7 +636,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     who_for_1: "A CodeCombat-ot 9 évesnél idősebb tanulóknak ajánljuk. Semmilyen programozási előismeret vagy tapasztalat nem szükséges."
     who_for_2: "Úgy terveztük meg a CodeCombat-ot, hogy fiúk és lányok számára is élvezetes legyen."
     material_title: "Mennyi anyagot tartalmaz?"
-    material_china: "Körülbelül 22 órányi játékidő a 120+ előfizetőknek járó pályákon, minden héten további 5 új pályával." # {change}
+    material_premium_server: "Körülbelül 22 órányi játékidő a 120+ előfizetőknek járó pályákon, minden héten további 5 új pályával." # {change}
     material_1: "Körülbelül 8 órányi ingyenes tartalom kiegészítve 14 órányi előfizetőknek járó tartalommal, minden héten további 5 új pályával." # {change}
 #    concepts_title: "What concepts are covered?"
     how_much_title: "Mennyibe kerül a havi előfizetés?"
@@ -838,6 +840,94 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    last_played: "Last played"
 #    leagues_explanation: "Play in a league against other clan members in these multiplayer arena instances."
 
+#  courses:
+#    course: "Course"
+#    courses: "courses"
+#    not_enrolled: "You are not enrolled in this course."
+#    visit_pref: "Please visit the"
+#    visit_suf: "page to enroll."
+#    select_class: "Select one of your classes"
+#    unnamed: "*unnamed*"
+#    select: "Select"
+#    unnamed_class: "Unnamed Class"
+#    edit_settings: "edit class settings"
+#    edit_settings1: "Edit Class Settings"
+#    progress: "Class Progress"
+#    add_students: "Add Students"
+#    stats: "Statistics"
+#    total_students: "Total students:"
+#    average_time: "Average level play time:"
+#    total_time: "Total play time:"
+#    average_levels: "Average levels completed:"
+#    total_levels: "Total levels completed:"
+#    furthest_level: "Furthest level completed:"
+#    concepts_covered: "Concepts Covered"
+#    students: "Students"
+#    students1: "students"
+#    expand_details: "Expand details"
+#    concepts: "Concepts"
+#    levels: "levels"
+#    played: "Played"
+#    play_time: "Play time:"
+#    completed: "Completed:"
+#    invite_students: "Invite students to join this class."
+#    invite_link_header: "Link to join course"
+#    invite_link_p_1: "Give this link to students you would like to have join the course."
+#    invite_link_p_2: "Or have us email them directly:"
+#    capacity_used: "Course slots used:"
+#    enter_emails: "Enter student emails to invite, one per line"
+#    send_invites: "Send Invites"
+#    title: "Title"
+#    description: "Description"
+#    languages_available: "Select programming languages available to the class:"
+#    all_lang: "All Languages"
+#    show_progress: "Show student progress to everyone in the class"
+#    creating_class: "Creating class..."
+#    purchasing_course: "Purchasing course..."
+#    buy_course: "Buy Course"
+#    buy_course1: "Buy this course"
+#    create_class: "Create Class"
+#    select_all_courses: "Select 'All Courses' for a 50% discount!"
+#    all_courses: "All Courses"
+#    number_students: "Number of students"
+#    enter_number_students: "Enter the number of students you need for this class."
+#    name_class: "Name your class"
+#    displayed_course_page: "This will be displayed on the course page for you and your students. It can be changed later."
+#    buy: "Buy"
+#    purchasing_for: "You are purchasing a license for"
+#    creating_for: "You are creating a class for"
+#    for: "for" # Like in 'for 30 students'
+#    receive_code: "Afterwards you will receive an unlock code to distribute to your students, which they can use to enroll in your class."
+#    free_trial: "Free trial for teachers!"
+#    get_access: "to get individual access to all courses for evalutaion purposes."
+#    questions: "Questions?"
+#    faq: "Courses FAQ"
+#    question: "Q:" # Like in 'Question'
+#    question1: "What's the difference between these courses and the single player game?"
+#    answer: "A:" # Like in 'Answer'
+#    answer1: "The single player game is designed for individuals, while the courses are designed for classes."
+#    answer2: "The single player game has items, gems, hero selection, leveling up, and in-app purchases. Courses have classroom management features and streamlined student-focused level pacing."
+#    teachers_click: "Teachers Click Here"
+#    students_click: "Students Click Here"
+#    courses_on_coco: "Courses on CodeCombat"
+#    designed_to: "Courses are designed to introduce computer science concepts using CodeCombat's fun and engaging environment. CodeCombat levels are organized around key topics to encourage progressive learning, over the course of 5 hours."
+#    more_in_less: "Learn more in less time"
+#    no_experience: "No coding experience necesssary"
+#    easy_monitor: "Easily monitor student progress"
+#    purchase_for_class: "Purchase a course for your entire class. It's easy to sign up your students!"
+#    see_the: "See the"
+#    more_info: "for more information."
+#    choose_course: "Choose Your Course:"
+#    enter_code: "Enter an unlock code to join an existing class"
+#    enter_code1: "Enter unlock code"
+#    enroll: "Enroll"
+#    pick_from_classes: "Pick from your current classes"
+#    enter: "Enter"
+#    or: "Or"
+#    topics: "Topics"
+#    hours_content: "Hours of content:"
+#    get_free: "Get FREE course"
+
   classes:
     archmage_title: "Főmágus"
     archmage_title_description: "(Kódoló)"
@@ -1028,9 +1118,9 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    simulation_explanation: "By simulating games you can get your game ranked faster!"
 #    simulation_explanation_leagues: "You will mainly help simulate games for allied players in your clans and courses."
 #    simulate_games: "Simulate Games!"
-#    simulate_all: "RESET AND SIMULATE GAMES"
 #    games_simulated_by: "Games simulated by you:"
 #    games_simulated_for: "Games simulated for you:"
+#    games_in_queue: "Games currently in the queue:"
 #    games_simulated: "Games simulated"
 #    games_played: "Games played"
 #    ratio: "Ratio"
@@ -1067,6 +1157,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     fight: "Harc!"
 #    watch_victory: "Watch your victory"
 #    defeat_the: "Defeat the"
+#    watch_battle: "Watch the battle"
 #    tournament_started: ", started"
     tournament_ends: "A torna vége"
     tournament_ended: "A torna végetért"
@@ -1074,10 +1165,16 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    tournament_blurb: "Write code, collect gold, build armies, crush foes, win prizes, and upgrade your career in our $40,000 Greed tournament! Check out the details"
 #    tournament_blurb_criss_cross: "Win bids, construct paths, outwit opponents, grab gems, and upgrade your career in our Criss-Cross tournament! Check out the details"
 #    tournament_blurb_zero_sum: "Unleash your coding creativity in both gold gathering and battle tactics in this alpine mirror match between red sorcerer and blue sorcerer. The tournament began on Friday, March 27 and will run until Monday, April 6 at 5PM PDT. Compete for fun and glory! Check out the details"
+#    tournament_blurb_ace_of_coders: "Battle it out in the frozen glacier in this domination-style mirror match! The tournament began on Wednesday, September 16 and will run until Wednesday, October 14 at 5PM PDT. Check out the details"
 #    tournament_blurb_blog: "on our blog"
     rules: "Szabályok"
     winners: "Győztesek"
 #    league: "League"
+#    red_ai: "Red AI" # "Red AI Wins", at end of multiplayer match playback
+#    blue_ai: "Blue AI"
+#    wins: "Wins" # At end of multiplayer match playback
+#    humans: "Red" # Ladder page display team name
+#    ogres: "Blue"
 
   user:
     stats: "Statisztika"
@@ -1117,6 +1214,8 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
     recently_played: "Utoljára játszott"
     no_recent_games: "Nem játszottál az utóbbi két hétben."
     payments: "Befizetések"
+#    prepaid: "Prepaid"
+#    prepaid_codes: "Prepaid Codes"
     purchased: "Vásárolt"
 #    sale: "Sale"
     subscription: "Előfizetés"
@@ -1147,6 +1246,14 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    retrying: "Server error, retrying."
 #    success: "Successfully paid. Thanks!"
 
+#  account_prepaid:
+#    purchase_code: "Purchase a Subscription Code"
+#    purchase_amount: "Amount"
+#    purchase_total: "Total"
+#    purchase_button: "Submit Purchase"
+#    your_codes: "Your Codes:"
+#    redeem_codes: "Redeem a Subscription Code"
+
 #  loading_error:
 #    could_not_load: "Error loading from server"
 #    connection_failure: "Connection failed."
@@ -1159,6 +1266,7 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    bad_input: "Bad input."
 #    server_error: "Server error."
 #    unknown: "Unknown error."
+#    error: "ERROR"
 
 #  resources:
 #    sessions: "Sessions"
@@ -1246,8 +1354,8 @@ module.exports = nativeDescription: "magyar", englishDescription: "Hungarian", t
 #    merge_conflict_with: "MERGE CONFLICT WITH"
 #    no_changes: "No Changes"
 
-#  guide:
-#    temp: "Temp"
+#  temp:
+#    ace_of_coders_tournament: "New: play in the Ace of Coders tournament now!"
 
   multiplayer:
     multiplayer_title: "Többjátékos beállítások" # We'll be changing this around significantly soon. Until then, it's not important to translate.

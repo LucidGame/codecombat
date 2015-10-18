@@ -15,6 +15,7 @@ module.exports = class LevelLoadingView extends CocoView
   subscriptions:
     'level:loaded': 'onLevelLoaded'  # If Level loads after level loading view.
     'level:subscription-required': 'onSubscriptionRequired'  # If they'd need a subscription to start playing.
+    'level:course-membership-required': 'onCourseMembershipRequired'  # If they'd need a subscription to start playing.
     'subscribe-modal:subscribed': 'onSubscribed'
 
   shortcuts:
@@ -71,7 +72,7 @@ module.exports = class LevelLoadingView extends CocoView
       @startUnveiling()
       @unveil()
     else
-      Backbone.Mediator.publish 'audio-player:play-sound', trigger: 'level_loaded', volume: 0.75  # old: loading_ready
+      @playSound 'level_loaded', 0.75  # old: loading_ready
       @$el.find('.progress').hide()
       @$el.find('.start-level-button').show()
 
@@ -97,7 +98,7 @@ module.exports = class LevelLoadingView extends CocoView
     loadingDetails.css 'top', -loadingDetails.outerHeight(true)
     @$el.find('.left-wing').css left: '-100%', backgroundPosition: 'right -400px top 0'
     @$el.find('.right-wing').css right: '-100%', backgroundPosition: 'left -400px top 0'
-    Backbone.Mediator.publish 'audio-player:play-sound', trigger: 'loading-view-unveil', volume: 0.5
+    @playSound 'loading-view-unveil', 0.5
     _.delay @onUnveilEnded, duration * 1000
     $('#level-footer-background').detach().appendTo('#page-container').slideDown(duration * 1000)
 
@@ -108,6 +109,10 @@ module.exports = class LevelLoadingView extends CocoView
   onSubscriptionRequired: (e) ->
     @$el.find('.level-loading-goals, .tip, .load-progress').hide()
     @$el.find('.subscription-required').show()
+
+  onCourseMembershipRequired: (e) ->
+    @$el.find('.level-loading-goals, .tip, .load-progress').hide()
+    @$el.find('.course-membership-required').show()
 
   onClickStartSubscription: (e) ->
     @openModalView new SubscribeModal()

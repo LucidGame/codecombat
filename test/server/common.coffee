@@ -103,6 +103,7 @@ unittest.getUser = (name, email, password, done, force) ->
       req = request.post(getURL('/db/user'), (err, response, body) ->
         throw err if err
         User.findOne({email: email}).exec((err, user) ->
+          throw err if err
           user.set('permissions', if password is '80yqxpb38j' then ['admin'] else [])
           user.set('name', name)
           user.save (err) ->
@@ -120,11 +121,54 @@ wrapUpGetUser = (email, user, done) ->
 GLOBAL.getURL = (path) ->
   return 'http://localhost:3001' + path
 
-GLOBAL.createPrepaid = (type, maxRedeemers, done) ->
+nameCount = 0
+GLOBAL.createName = (name) ->
+  name + nameCount++
+
+GLOBAL.createCourse = (pricePerSeat, done) ->
+  name = createName 'course '
+  course = new Course
+    name: name
+    campaignID: ObjectId("55b29efd1cd6abe8ce07db0d")
+    concepts: ['basic_syntax', 'arguments', 'while_loops', 'strings', 'variables']
+    description: "Learn basic syntax, while loops, and the CodeCombat environment."
+    pricePerSeat: pricePerSeat
+    screenshot: "/images/pages/courses/101_info.png"
+  course.save (err, course) =>
+    return done(err) if err
+    done(err, course)
+
+GLOBAL.createPrepaid = (type, maxRedeemers, months, done) ->
   options = uri: GLOBAL.getURL('/db/prepaid/-/create')
   options.json =
     type: type
     maxRedeemers: maxRedeemers
+  if months
+    options.json.months = months
+  request.post options, done
+
+GLOBAL.fetchPrepaid = (ppc, done) ->
+  options = uri: GLOBAL.getURL('/db/prepaid/-/code/'+ppc)
+  request.get options, done
+
+GLOBAL.purchasePrepaid = (type, properties, maxRedeemers, token, done) ->
+  options = uri: GLOBAL.getURL('/db/prepaid/-/purchase')
+  options.json =
+    type: type
+    maxRedeemers: maxRedeemers
+    stripe:
+      timestamp: new Date().getTime()
+  options.json.stripe.token = token if token?
+  if type is 'terminal_subscription'
+    options.json.months = properties.months
+  else if type is 'course'
+    options.json.courseID = properties.courseID if properties?.courseID
+  request.post options, done
+
+GLOBAL.subscribeWithPrepaid = (ppc, done) =>
+  options = url: GLOBAL.getURL('/db/subscription/-/subscribe_prepaid')
+  options.json =
+    ppc: ppc
   request.post options, done
 
 newUserCount = 0

@@ -30,6 +30,7 @@ module.exports = class HeroVictoryModal extends ModalView
     'click .return-to-ladder-button': 'onClickReturnToLadder'
     'click .sign-up-button': 'onClickSignupButton'
     'click .continue-from-offer-button': 'onClickContinueFromOffer'
+    'click .skip-offer-button': 'onClickSkipOffer'
 
     # Feedback events
     'mouseover .rating i': (e) -> @showStars(@starNum($(e.target)))
@@ -41,6 +42,9 @@ module.exports = class HeroVictoryModal extends ModalView
 
   constructor: (options) ->
     super(options)
+    @courseID = options.courseID
+    @courseInstanceID = options.courseInstanceID
+
     @session = options.session
     @level = options.level
     @thangTypes = {}
@@ -57,7 +61,7 @@ module.exports = class HeroVictoryModal extends ModalView
       @previousLevel = me.level()
     else
       @readyToContinue = true
-    Backbone.Mediator.publish 'audio-player:play-sound', trigger: 'victory'
+    @playSound 'victory'
     if @level.get('type', true) is 'course' and nextLevel = @level.get('nextLevel')
       @nextLevel = new Level().setURL "/db/level/#{nextLevel.original}/version/#{nextLevel.majorVersion}"
       @nextLevel = @supermodel.loadModel(@nextLevel, 'level').model
@@ -185,11 +189,13 @@ module.exports = class HeroVictoryModal extends ModalView
     elapsed = (new Date() - new Date(me.get('dateCreated')))
     isHourOfCode = me.get('hourOfCode') or elapsed < 120 * 60 * 1000
     # Later we should only check me.get('hourOfCode'), but for now so much traffic comes in that we just assume it.
+    # TODO: get rid of said assumption sometime in November 2015 when code.org/learn updates to the new version for Hour of Code tutorials.
     if isHourOfCode
       # Show the Hour of Code "I'm Done" tracking pixel after they played for 20 minutes
-      enough = elapsed >= 20 * 60 * 1000
+      lastLevel = @level.get('slug') is 'course-kithgard-gates'
+      enough = elapsed >= 20 * 60 * 1000 or lastLevel
       tooMuch = elapsed > 120 * 60 * 1000
-      showDone = elapsed >= 30 * 60 * 1000 and not tooMuch
+      showDone = (elapsed >= 30 * 60 * 1000 and not tooMuch) or lastLevel
       if enough and not tooMuch and not me.get('hourOfCodeComplete')
         $('body').append($('<img src="http://code.org/api/hour/finish_codecombat.png" style="visibility: hidden;">'))
         me.set 'hourOfCodeComplete', true  # Note that this will track even for players who don't have hourOfCode set.
@@ -206,7 +212,7 @@ module.exports = class HeroVictoryModal extends ModalView
 
   afterRender: ->
     super()
-    @$el.toggleClass 'show-achievements', @level.get('type', true) is 'hero'
+    @$el.toggleClass 'with-achievements', @level.get('type', true) is 'hero'
     return unless @supermodel.finished()
     @playSelectionSound hero, true for original, hero of @thangTypes  # Preload them
     @updateSavingProgressStatus()
@@ -218,9 +224,10 @@ module.exports = class HeroVictoryModal extends ModalView
   initializeAnimations: ->
     if @level.get('type', true) is 'hero'
       @updateXPBars 0
+    #playVictorySound = => @playSound 'victory-title-appear'  # TODO: actually add this
     @$el.find('#victory-header').delay(250).queue(->
       $(@).removeClass('out').dequeue()
-      Backbone.Mediator.publish 'audio-player:play-sound', trigger: 'victory-title-appear'  # TODO: actually add this
+      #playVictorySound()
     )
     complete = _.once(_.bind(@beginSequentialAnimations, @))
     @animatedPanels = $()
@@ -283,7 +290,7 @@ module.exports = class HeroVictoryModal extends ModalView
         @XPEl.text(totalXP)
         @updateXPBars(totalXP)
         xpTrigger = 'xp-' + (totalXP % 6)  # 6 xp sounds
-        Backbone.Mediator.publish 'audio-player:play-sound', trigger: xpTrigger, volume: 0.5 + ratio / 2
+        @playSound xpTrigger, (0.5 + ratio / 2)
         @XPEl.addClass 'four-digits' if totalXP >= 1000 and @lastTotalXP < 1000
         @XPEl.addClass 'five-digits' if totalXP >= 10000 and @lastTotalXP < 10000
         @lastTotalXP = totalXP
@@ -294,14 +301,14 @@ module.exports = class HeroVictoryModal extends ModalView
         panel.textEl.text('+' + newGems)
         @gemEl.text(totalGems)
         gemTrigger = 'gem-' + (parseInt(panel.number * ratio) % 4)  # 4 gem sounds
-        Backbone.Mediator.publish 'audio-player:play-sound', trigger: gemTrigger, volume: 0.5 + ratio / 2
+        @playSound gemTrigger, (0.5 + ratio / 2)
         @gemEl.addClass 'four-digits' if totalGems >= 1000 and @lastTotalGems < 1000
         @gemEl.addClass 'five-digits' if totalGems >= 10000 and @lastTotalGems < 10000
         @lastTotalGems = totalGems
     else if panel.item
       thangType = @thangTypes[panel.item]
       panel.textEl.text utils.i18n(thangType.attributes, 'name')
-      Backbone.Mediator.publish 'audio-player:play-sound', trigger: 'item-unlocked', volume: 1 if 0.5 < ratio < 0.6
+      @playSound 'item-unlocked' if 0.5 < ratio < 0.6
     else if panel.hero
       thangType = @thangTypes[panel.hero]
       panel.textEl.text(thangType.get('name'))
@@ -392,19 +399,23 @@ module.exports = class HeroVictoryModal extends ModalView
       AudioPlayer.playSound name, 1
 
   getNextLevelCampaign: ->
-    {'kithgard-gates': 'forest', 'kithgard-mastery': 'forest', 'siege-of-stonehold': 'desert', 'clash-of-clones': 'mountain'}[@level.get('slug')] or @level.get 'campaign'  # Much easier to just keep this updated than to dynamically figure it out.
+    {'kithgard-gates': 'forest', 'kithgard-mastery': 'forest', 'siege-of-stonehold': 'desert', 'clash-of-clones': 'mountain', 'summits-gate': 'glacier'}[@level.get('slug')] or @level.get 'campaign'  # Much easier to just keep this updated than to dynamically figure it out.
 
   getNextLevelLink: (returnToCourse=false) ->
     if @level.get('type', true) is 'course' and nextLevel = @level.get('nextLevel') and not returnToCourse
       # need to do something more complicated to load its slug
       console.log 'have @nextLevel', @nextLevel, 'from nextLevel', nextLevel
-      return "/play/level/#{@nextLevel.get('slug')}"
+      link = "/play/level/#{@nextLevel.get('slug')}"
     else if @level.get('type', true) is 'course'
-      # TODO: figure out which course it is
-      return '/courses/mock1/0'
-    link = '/play'
-    nextCampaign = @getNextLevelCampaign()
-    link += '/' + nextCampaign
+      link = "/courses"
+      if @courseID
+        link += "/#{@courseID}"
+        if @courseInstanceID
+          link += "/#{@courseInstanceID}"
+    else
+      link = '/play'
+      nextCampaign = @getNextLevelCampaign()
+      link += '/' + nextCampaign
     link
 
   onClickContinue: (e, extraOptions=null) ->
@@ -417,11 +428,20 @@ module.exports = class HeroVictoryModal extends ModalView
     _.merge options, extraOptions if extraOptions
     if @level.get('type', true) is 'course' and @nextLevel and not options.returnToCourse
       viewClass = require 'views/play/level/PlayLevelView'
+      if @courseID
+        options.courseID = @courseID
+      if @courseInstanceID
+        options.courseInstanceID = @courseInstanceID
       viewArgs = [options, @nextLevel.get('slug')]
     else if @level.get('type', true) is 'course'
-      options.studentMode = true
-      viewClass = require 'views/courses/mock1/CourseDetailsView'
-      viewArgs = [options, '0']
+      # TODO: shouldn't set viewClass and route in different places
+      viewClass = require 'views/courses/CoursesView'
+      viewArgs = [options]
+      if @courseID
+        viewClass = require 'views/courses/CourseDetailsView'
+        viewArgs.push @courseID
+        if @courseInstanceID
+          viewArgs.push @courseInstanceID
     else
       viewClass = require 'views/play/CampaignView'
       viewArgs = [options, @getNextLevelCampaign()]
@@ -460,6 +480,9 @@ module.exports = class HeroVictoryModal extends ModalView
     }[@level.get('slug')]
     Backbone.Mediator.publish 'router:navigate', @navigationEventUponCompletion
     window.open url, '_blank' if url
+
+  onClickSkipOffer: (e) ->
+    Backbone.Mediator.publish 'router:navigate', @navigationEventUponCompletion
 
   # Ratings and reviews
 

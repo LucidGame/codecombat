@@ -1,6 +1,7 @@
 CocoModel = require './CocoModel'
 SpriteBuilder = require 'lib/sprites/SpriteBuilder'
 LevelComponent = require './LevelComponent'
+CocoCollection = require 'collections/CocoCollection'
 
 utils = require 'core/utils'
 
@@ -35,6 +36,7 @@ module.exports = class ThangType extends CocoModel
   urlRoot: '/db/thang.type'
   building: {}
   editableByArtisans: true
+  @defaultActions: ['idle', 'die', 'move', 'attack']
 
   initialize: ->
     super()
@@ -77,6 +79,14 @@ module.exports = class ThangType extends CocoModel
   getActions: ->
     return {} unless @isFullyLoaded()
     return @actions or @buildActions()
+
+  getDefaultActions: ->
+    actions = []
+    for action in _.values(@getActions())
+      continue unless _.any ThangType.defaultActions, (prefix) ->
+        _.string.startsWith(action.name, prefix)
+      actions.push(action)
+    return actions
 
   buildActions: ->
     return null unless @isFullyLoaded()
@@ -479,3 +489,86 @@ module.exports = class ThangType extends CocoModel
     playerLevel = me.constructor.levelForTier playerTier
     #console.log 'Level required for', @get('name'), 'is', playerLevel, 'player tier', playerTier, 'because it is itemTier', itemTier, 'which is normally level', me.constructor.levelForTier(itemTier)
     playerLevel
+
+  getContainersForAnimation: (animation, action) ->
+    rawAnimation = @get('raw').animations[animation]
+    if not rawAnimation
+      console.error 'thang type', @get('name'), 'is missing animation', animation, 'from action', action
+    containers = rawAnimation.containers
+    for animation in @get('raw').animations[animation].animations
+      containers = containers.concat(@getContainersForAnimation(animation.gn, action))
+    return containers
+
+  getContainersForActions: (actionNames) ->
+    containersToRender = {}
+    actions = @getActions()
+    for actionName in actionNames
+      action = _.find(actions, {name: actionName})
+      if action.container
+        containersToRender[action.container] = true
+      else if action.animation
+        animationContainers = @getContainersForAnimation(action.animation, action)
+        containersToRender[container.gn] = true for container in animationContainers
+    return _.keys(containersToRender)
+
+  nextForAction: (action) ->
+    next = true
+    next = action.goesTo if action.goesTo
+    next = false if action.loops is false
+    return next
+
+  initPrerenderedSpriteSheets: ->
+    return if @prerenderedSpriteSheets or not data = @get('prerenderedSpriteSheetData')
+    # creates a collection of prerendered sprite sheets
+    @prerenderedSpriteSheets = new PrerenderedSpriteSheets(data)
+
+  getPrerenderedSpriteSheet: (colorConfig, defaultSpriteType) ->
+    return unless @prerenderedSpriteSheets
+    spriteType = @get('spriteType') or defaultSpriteType
+    @prerenderedSpriteSheets.find (pss) ->
+      return false if pss.get('spriteType') isnt spriteType
+      otherColorConfig = pss.get('colorConfig')
+      return true if _.isEmpty(colorConfig) and _.isEmpty(otherColorConfig)
+      getHue = (config) -> _.result(_.result(config, 'team'), 'hue')
+      return getHue(colorConfig) is getHue(otherColorConfig)
+
+  getPrerenderedSpriteSheetToLoad: ->
+    return unless @prerenderedSpriteSheets
+    @prerenderedSpriteSheets.find (pss) -> pss.needToLoad and not pss.loadedImage
+
+
+class PrerenderedSpriteSheet extends CocoModel
+  @className: 'PrerenderedSpriteSheet'
+
+  loadImage: ->
+    return false if @loadingImage or @loadedImage
+    return false unless imageURL = @get('image')
+    @image = $("<img src='/file/#{imageURL}' />")
+    @loadingImage = true
+    @image.one('load', =>
+      @loadingImage = false
+      @loadedImage = true
+      @buildSpriteSheet()
+      @trigger('image-loaded', @))
+    @image.one('error', =>
+      @loadingImage = false
+      @trigger('image-load-error', @)
+    )
+    return true
+
+  buildSpriteSheet: ->
+    @spriteSheet = new createjs.SpriteSheet({
+      images: [@image[0]],
+      frames: @get('frames')
+      animations: @get('animations')
+    })
+
+  markToLoad: -> @needToLoad = true
+
+  needToLoad: false
+  loadedImage: false
+  loadingImage: false
+
+
+class PrerenderedSpriteSheets extends CocoCollection
+  model: PrerenderedSpriteSheet

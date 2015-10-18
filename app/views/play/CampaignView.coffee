@@ -106,6 +106,7 @@ module.exports = class CampaignView extends RootView
     window.tracker?.trackEvent 'Loaded World Map', category: 'World Map', label: @terrain
 
     # If it's a new player who didn't appear to come from Hour of Code, we register her here without setting the hourOfCode property.
+    # TODO: get rid of all this sometime in November 2015 when code.org/learn updates to the new version for Hour of Code tutorials.
     elapsed = (new Date() - new Date(me.get('dateCreated')))
     if not trackedHourOfCode and not me.get('hourOfCode') and elapsed < 5 * 60 * 1000
       $('body').append($('<img src="https://code.org/api/hour/begin_codecombat.png" style="visibility: hidden;">'))
@@ -183,7 +184,6 @@ module.exports = class CampaignView extends RootView
     context.levelDifficultyMap = @levelDifficultyMap
     context.levelPlayCountMap = @levelPlayCountMap
     context.isIPadApp = application.isIPadApp
-    context.mapType = _.string.slugify @terrain
     context.requiresSubscription = @requiresSubscription
     context.editorMode = @editorMode
     context.adjacentCampaigns = _.filter _.values(_.cloneDeep(@campaign?.get('adjacentCampaigns') or {})), (ac) =>
@@ -267,7 +267,7 @@ module.exports = class CampaignView extends RootView
     level.locked = false if @campaign?.get('name') is 'Auditions'
     level.locked = false if @campaign?.get('name') is 'Intro'
     level.locked = false if me.isInGodMode()
-    level.locked = false if level.slug is 'robot-ragnarok'
+    #level.locked = false if level.slug is 'robot-ragnarok'
     level.disabled = true if level.adminOnly and @levelStatusMap[level.slug] not in ['started', 'complete']
     level.disabled = false if me.isInGodMode()
     level.color = 'rgb(255, 80, 60)'
@@ -305,6 +305,11 @@ module.exports = class CampaignView extends RootView
   determineNextLevel: (levels) ->
     foundNext = false
     dontPointTo = ['lost-viking', 'kithgard-mastery']  # Challenge levels we don't want most players bashing heads against
+    subscriptionPrompts = [{slug: 'boom-and-bust', unless: 'defense-of-plainswood'}]
+    if me.getSubscriptionPromptGroup() is 'favorable-odds'
+      subscriptionPrompts.push slug: 'favorable-odds', unless: 'the-raised-sword'
+    if me.getSubscriptionPromptGroup() is 'tactical-strike'
+      subscriptionPrompts.push slug: 'tactical-strike', unless: 'a-mayhem-of-munchkins'
     for level in levels
       # Iterate through all levels in order and look to find the first unlocked one that meets all our criteria for being pointed out as the next level.
       level.nextLevels = (reward.level for reward in level.rewards ? [] when reward.level)
@@ -321,11 +326,8 @@ module.exports = class CampaignView extends RootView
 
           # Should we point this level out?
           if nextLevel and not nextLevel.locked and not nextLevel.disabled and @levelStatusMap[nextLevel.slug] isnt 'complete' and nextLevel.slug not in dontPointTo and not nextLevel.replayable and (
-            me.isPremium() or
-            not nextLevel.requiresSubscription or
-            (nextLevel.slug is 'boom-and-bust' and not @levelStatusMap['defense-of-plainswood']) or
-            (nextLevel.slug is 'favorable-odds' and not @levelStatusMap['the-raised-sword']) or
-            (nextLevel.slug is 'robot-ragnarok' and @levelStatusMap['the-raised-sword'])
+            me.isPremium() or not nextLevel.requiresSubscription or
+            _.any(subscriptionPrompts, (prompt) => nextLevel.slug is prompt.slug and not @levelStatusMap[prompt.unless])
           )
             nextLevel.next = true
             foundNext = true
@@ -375,13 +377,13 @@ module.exports = class CampaignView extends RootView
     @particleMan.removeEmitters()
     @particleMan.attach @$el.find('.map')
     for level in @campaign.renderedLevels ? {}
-      particleKey = ['level', @terrain]
+      particleKey = ['level', @terrain.replace('-branching-test', '')]
       particleKey.push level.type if level.type and not (level.type in ['hero', 'course'])
       particleKey.push 'replayable' if level.replayable
       particleKey.push 'premium' if level.requiresSubscription
       particleKey.push 'gate' if level.slug in ['kithgard-gates', 'siege-of-stonehold', 'clash-of-clones', 'summits-gate']
       particleKey.push 'hero' if level.unlocksHero and not level.unlockedHero
-      particleKey.push 'item' if level.slug is 'robot-ragnarok'  # TODO: generalize
+      #particleKey.push 'item' if level.slug is 'robot-ragnarok'  # TODO: generalize
       continue if particleKey.length is 2  # Don't show basic levels
       continue unless level.hidden or _.intersection(particleKey, ['item', 'hero-ladder', 'replayable']).length
       @particleMan.addEmitter level.position.x / 100, level.position.y / 100, particleKey.join('-')
@@ -475,7 +477,7 @@ module.exports = class CampaignView extends RootView
     levelOriginal = levelElement.data('level-original')
     level = _.find _.values(@campaign.get('levels')), slug: levelSlug
 
-    requiresSubscription = level.requiresSubscription or (me.get('chinaVersion') and not (level.slug in ['dungeons-of-kithgard', 'gems-in-the-deep', 'shadow-guard', 'forgetful-gemsmith', 'signs-and-portents', 'true-names']))
+    requiresSubscription = level.requiresSubscription or (me.isOnPremiumServer() and not (level.slug in ['dungeons-of-kithgard', 'gems-in-the-deep', 'shadow-guard', 'forgetful-gemsmith', 'signs-and-portents', 'true-names']))
     canPlayAnyway = not @requiresSubscription or level.adventurer or @levelStatusMap[level.slug]
     if requiresSubscription and not canPlayAnyway
       @openModalView new SubscribeModal()

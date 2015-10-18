@@ -31,6 +31,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     contact: "Contact"
     twitter_follow: "Suivre"
     teachers: "Enseignants"
+#    careers: "Careers"
 
   modal:
     close: "Fermer"
@@ -136,7 +137,6 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     save: "Sauvegarder"
     publish: "Publier"
     create: "Creer"
-    manual: "Manuel"
     fork: "Fork"
     play: "Jouer" # When used as an action verb, like "Play next level"
     retry: "Reessayer"
@@ -159,10 +159,12 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     accepted: "Accepté"
     rejected: "Rejeté"
     withdrawn: "Retiré"
+#    accept: "Accept"
+#    reject: "Reject"
+#    withdraw: "Withdraw"
     submitter: "Soumissionnaire"
     submitted: "Soumis"
     commit_msg: "Message de mise à jour"
-    review: "Examen"
     version_history: "Historique des versions"
     version_history_for: "Historique des versions pour : "
     select_changes: "Sélectionner deux changements plus bas pour voir la différence."
@@ -215,6 +217,8 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
 
   play_level:
     done: "Fait"
+#    next_game: "Next game"
+#    show_menu: "Show game menu"
     home: "Accueil" # Not used any more, will be removed soon.
     level: "Niveau" # Like "Level: Dungeons of Kithgard"
     skip: "Passer"
@@ -271,7 +275,6 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     tome_select_a_thang: "Sélectionnez une unité pour"
     tome_available_spells: "Sorts diponibles"
     tome_your_skills: "Vos compétences"
-    tome_help: "Aide"
     tome_current_method: "Méthode actuelle"
     hud_continue_short: "Continuer"
     code_saved: "Code sauvergardé"
@@ -280,7 +283,6 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     loading_ready: "Pret!"
     loading_start: "Démarrer niveau"
     problem_alert_title: "Corriger votre code"
-    problem_alert_help: "Aide"
     time_current: "Maintenant :"
     time_total: "Max :"
     time_goto: "Allez à :"
@@ -341,6 +343,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     tip_free_your_mind: "Vous devez laisser aller , Neo . La peur , le doute et l'incrédulité . Libère ton esprit. - Morpheus"
     tip_strong_opponents: "Même les ennemis les plus puissant ont une faiblesse. - Itachi Uchiha"
 #    tip_paper_and_pen: "Before you start coding, you can always plan with a sheet of paper and a pen."
+#    solve_then_write: "First, solve the problem. Then, write the code. - John Johnson"
 
   game_menu:
     inventory_tab: "Inventaire"
@@ -410,6 +413,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     feature7: "<strong>Clans</strong> privés"
     free: "Gratuit"
     month: "mois"
+#    must_be_logged: "You must be logged in first. Please create an account or log in from the menu above."
     subscribe_title: "Abonnement"
     unsubscribe: "Désinscription"
     confirm_unsubscribe: "Confirmer la désinscription"
@@ -439,7 +443,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     payment_methods_blurb2: "Si vous avez besoins d'un autre moyen de paiement, merci de nous contacter"
 #    sale_already_subscribed: "You're already subscribed!"
 #    sale_blurb1: "Save 35%"
-#    sale_blurb2: "off regular subscription price of $120 for a whole year!" # {changed}
+#    sale_blurb2: "off regular subscription price of $120 for a whole year!"
 #    sale_button: "Sale!"
 #    sale_button_title: "Save 35% when you purchase a 1 year subscription"
 #    sale_click_here: "Click Here"
@@ -462,7 +466,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     managed_by: "Gérer par"
     will_be_cancelled: "Ceci va être annuler"
     currently_free: "Vous avez un abonnement gratuit en ce moment"
-    currently_free_until: "Vous avez un abonnement gratuit jusqu'à" # {changed}
+    currently_free_until: "Vous avez un abonnement gratuit jusqu'à"
     was_free_until: "Vous aviez un abonnement gratuit jusqu'à"
     managed_subs: "Gestion des abonnements"
     managed_subs_desc: "Ajout d'abonnements pour les autres joueurs (étudiants,enfants,etc.) for other players."
@@ -526,6 +530,8 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
   skill_docs:
     writable: "éditable" # Hover over "attack" in Your Skills while playing a level to see most of this
     read_only: "lecture seulement"
+#    action: "Action"
+#    spell: "Spell"
     action_name: "nom"
     action_cooldown: "Durée"
     action_specific_cooldown: "Rechargement"
@@ -550,12 +556,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     volume_label: "Volume"
     music_label: "Musique"
     music_description: "Arrêter/Reprendre la musique de fond."
-    editor_config: "Config de l'éditeur"
     editor_config_title: "Configuration de l'éditeur"
-    editor_config_level_language_label: "Langage pour le niveau"
-    editor_config_level_language_description: "Définir le langage de programmation pour le niveau en particulier."
-    editor_config_default_language_label: "Langage de programmation par défaut"
-    editor_config_default_language_description: "Choississez le langage de programmation que vous souhaitez dans les nouveaux niveaux"
     editor_config_keybindings_label: "Raccourcis clavier"
     editor_config_keybindings_default: "Par défault (Ace)"
     editor_config_keybindings_description: "Ajouter de nouveaux raccourcis connus depuis l'éditeur commun."
@@ -606,10 +607,11 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     intro_1: "CodeCombat est un jeu en ligne qui enseigne la programmation. Les élèves écrivent du code dans de vrais langages de programmation."
     intro_2: "Aucune expérience requise !"
     free_title: "Combien cela coûte-t-il ?"
-    cost_china: "CodeCombat en Chine est gratuit pour les cinq premiers niveaux,après le jeu coûte 9.99$ US par mois pour avoir un accès aux autres 140+ niveaux sur les serveurs exlcusifs chinois"
+#    cost_premium_server: "CodeCombat is free for the first five levels, after which it costs $9.99 USD per month for access to our other 190+ levels on our exclusive country-specific servers."
     free_1: "La version de base de CodeCombat est gratuite ! Il y a 70+ niveaux gratuits qui couvrent chaque concepts." # {change}
     free_2: "Un abonnement mensuel fournit l'accès à des vidéos de tutoriels ainsi qu'à des niveaux d'entraînement supplémentaires."
     teacher_subs_title: "Les enseignants reçoivent un abonnement gratuit !"
+#    teacher_subs_0: "We offer free subscriptions to teachers for evaluation purposes."
     teacher_subs_1: "Merci de nous contacter" # {change}
     teacher_subs_2: "pour obtenir un abonnement mensuel gratuit." # {change}
 #    teacher_subs_3: "to set up your subscription."
@@ -634,7 +636,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     who_for_1: "Nous recommandons CodeCombat pour les élèves âgés de 9 ans ou plus. Aucune expérience préalable de programmation n'est requise."
     who_for_2: "Nous avons conçu CodeCombat pour plaire à la fois aux garçons et aux filles."
     material_title: "Quelle quantité de contenu y a t-il ?"
-    material_china: "Il y a en moyenne une trentaine d'heures de temps de jeu distribué sur plus de 140 abonnés jusqu'à maintenant avec des nouveaux niveaux qui s'ajoutent à chaque semaine." # {change}
+    material_premium_server: "Il y a en moyenne une trentaine d'heures de temps de jeu distribué sur plus de 140 abonnés jusqu'à maintenant avec des nouveaux niveaux qui s'ajoutent à chaque semaine." # {change}
     material_1: "Environ 8 heures de contenu gratuit et 14 heures de contenu supplémentaire reservé aux abonnés, avec 5 nouveaux niveaux chaque semaines." # {change}
     concepts_title: "Quels concepts sont couverts ?"
     how_much_title: "Combien coûte un abonnement mensuel ?"
@@ -838,6 +840,94 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     last_played: "Dernière période de jeu"
 #    leagues_explanation: "Play in a league against other clan members in these multiplayer arena instances."
 
+#  courses:
+#    course: "Course"
+#    courses: "courses"
+#    not_enrolled: "You are not enrolled in this course."
+#    visit_pref: "Please visit the"
+#    visit_suf: "page to enroll."
+#    select_class: "Select one of your classes"
+#    unnamed: "*unnamed*"
+#    select: "Select"
+#    unnamed_class: "Unnamed Class"
+#    edit_settings: "edit class settings"
+#    edit_settings1: "Edit Class Settings"
+#    progress: "Class Progress"
+#    add_students: "Add Students"
+#    stats: "Statistics"
+#    total_students: "Total students:"
+#    average_time: "Average level play time:"
+#    total_time: "Total play time:"
+#    average_levels: "Average levels completed:"
+#    total_levels: "Total levels completed:"
+#    furthest_level: "Furthest level completed:"
+#    concepts_covered: "Concepts Covered"
+#    students: "Students"
+#    students1: "students"
+#    expand_details: "Expand details"
+#    concepts: "Concepts"
+#    levels: "levels"
+#    played: "Played"
+#    play_time: "Play time:"
+#    completed: "Completed:"
+#    invite_students: "Invite students to join this class."
+#    invite_link_header: "Link to join course"
+#    invite_link_p_1: "Give this link to students you would like to have join the course."
+#    invite_link_p_2: "Or have us email them directly:"
+#    capacity_used: "Course slots used:"
+#    enter_emails: "Enter student emails to invite, one per line"
+#    send_invites: "Send Invites"
+#    title: "Title"
+#    description: "Description"
+#    languages_available: "Select programming languages available to the class:"
+#    all_lang: "All Languages"
+#    show_progress: "Show student progress to everyone in the class"
+#    creating_class: "Creating class..."
+#    purchasing_course: "Purchasing course..."
+#    buy_course: "Buy Course"
+#    buy_course1: "Buy this course"
+#    create_class: "Create Class"
+#    select_all_courses: "Select 'All Courses' for a 50% discount!"
+#    all_courses: "All Courses"
+#    number_students: "Number of students"
+#    enter_number_students: "Enter the number of students you need for this class."
+#    name_class: "Name your class"
+#    displayed_course_page: "This will be displayed on the course page for you and your students. It can be changed later."
+#    buy: "Buy"
+#    purchasing_for: "You are purchasing a license for"
+#    creating_for: "You are creating a class for"
+#    for: "for" # Like in 'for 30 students'
+#    receive_code: "Afterwards you will receive an unlock code to distribute to your students, which they can use to enroll in your class."
+#    free_trial: "Free trial for teachers!"
+#    get_access: "to get individual access to all courses for evalutaion purposes."
+#    questions: "Questions?"
+#    faq: "Courses FAQ"
+#    question: "Q:" # Like in 'Question'
+#    question1: "What's the difference between these courses and the single player game?"
+#    answer: "A:" # Like in 'Answer'
+#    answer1: "The single player game is designed for individuals, while the courses are designed for classes."
+#    answer2: "The single player game has items, gems, hero selection, leveling up, and in-app purchases. Courses have classroom management features and streamlined student-focused level pacing."
+#    teachers_click: "Teachers Click Here"
+#    students_click: "Students Click Here"
+#    courses_on_coco: "Courses on CodeCombat"
+#    designed_to: "Courses are designed to introduce computer science concepts using CodeCombat's fun and engaging environment. CodeCombat levels are organized around key topics to encourage progressive learning, over the course of 5 hours."
+#    more_in_less: "Learn more in less time"
+#    no_experience: "No coding experience necesssary"
+#    easy_monitor: "Easily monitor student progress"
+#    purchase_for_class: "Purchase a course for your entire class. It's easy to sign up your students!"
+#    see_the: "See the"
+#    more_info: "for more information."
+#    choose_course: "Choose Your Course:"
+#    enter_code: "Enter an unlock code to join an existing class"
+#    enter_code1: "Enter unlock code"
+#    enroll: "Enroll"
+#    pick_from_classes: "Pick from your current classes"
+#    enter: "Enter"
+#    or: "Or"
+#    topics: "Topics"
+#    hours_content: "Hours of content:"
+#    get_free: "Get FREE course"
+
   classes:
     archmage_title: "Archimage"
     archmage_title_description: "(Développeur)"
@@ -944,7 +1034,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     tasks: "Tâches"
     clear_storage: "Vider vos changements locaux"
 #    add_system_title: "Add Systems to Level"
-#    done_adding: "Done Adding"
+    done_adding: "Fait Ajouter"
 
   article:
     edit_btn_preview: "Prévisualiser"
@@ -1028,9 +1118,9 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     simulation_explanation: "En simulant une partie, tu peux classer ton rang plus rapidement !"
 #    simulation_explanation_leagues: "You will mainly help simulate games for allied players in your clans and courses."
     simulate_games: "Simuler une partie !"
-    simulate_all: "REINITIALISER ET SIMULER DES PARTIES"
     games_simulated_by: "Parties que vous avez simulées :"
     games_simulated_for: "Parties simulées pour vous :"
+#    games_in_queue: "Games currently in the queue:"
     games_simulated: "Partie simulée"
     games_played: "Parties jouées"
     ratio: "Moyenne"
@@ -1067,6 +1157,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     fight: "Combattez !"
     watch_victory: "Regardez votre victoire"
     defeat_the: "Vaincre le"
+#    watch_battle: "Watch the battle"
     tournament_started: ", a démarré"
     tournament_ends: "Fin du tournoi"
     tournament_ended: "Tournoi terminé"
@@ -1074,10 +1165,16 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     tournament_blurb: "Écrire du code, collecter de l'or, construire des armées, écraser les ennemis, gagner des prix, et mettre à jour votre carrière dans notre tournoi $ 40,000 Greed! Découvrez les détails"
     tournament_blurb_criss_cross: "Gagnez des offres, construisez des chemins, déjouez les adversaires, emparez-vous des gemmes, et améliorez votre carrière dans notre tournoi Criss-Cross! Découvrez les détails"
     tournament_blurb_zero_sum: "Libérez votre créativité en programmation dans l'accumulation d'or et de tactiques de combat dans ce combat épique entre le sorcier rouge et bleu. Le tournoi a commencé vendredi le 27 mars et se déroulera jusqu'à lundi le 6 avril à 5PM PDT. Battez-vous pour le plaisir et l'honneur! Aller voir les détails."
+#    tournament_blurb_ace_of_coders: "Battle it out in the frozen glacier in this domination-style mirror match! The tournament began on Wednesday, September 16 and will run until Wednesday, October 14 at 5PM PDT. Check out the details"
     tournament_blurb_blog: "Sur notre blog"
     rules: "Règles"
     winners: "Gagnants"
 #    league: "League"
+    red_ai: "Rouge IA" # "Red AI Wins", at end of multiplayer match playback
+    blue_ai: "Bleue AI"
+#    wins: "Wins" # At end of multiplayer match playback
+    humans: "Rouge" # Ladder page display team name
+    ogres: "Bleue"
 
   user:
     stats: "Stats"
@@ -1117,6 +1214,8 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     recently_played: "Joué récemment"
     no_recent_games: "Aucune partie jouée au cours des deux dernières semaines."
     payments: "Paiements"
+#    prepaid: "Prepaid"
+#    prepaid_codes: "Prepaid Codes"
     purchased: "Acheté"
 #    sale: "Sale"
     subscription: "Souscrit"
@@ -1147,6 +1246,14 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     retrying: "Erreur interne, réessayez"
     success: "Paiement accepté, Merci !"
 
+#  account_prepaid:
+#    purchase_code: "Purchase a Subscription Code"
+#    purchase_amount: "Amount"
+#    purchase_total: "Total"
+#    purchase_button: "Submit Purchase"
+#    your_codes: "Your Codes:"
+#    redeem_codes: "Redeem a Subscription Code"
+
   loading_error:
     could_not_load: "Erreur de chargement du serveur"
     connection_failure: "La connexion a échoué."
@@ -1159,6 +1266,7 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     bad_input: "Données incorrectes ."
     server_error: "Erreur serveur."
     unknown: "Erreur inconnue."
+    error: "ERREUR"
 
   resources:
     sessions: "Sessions"
@@ -1246,8 +1354,8 @@ module.exports = nativeDescription: "français", englishDescription: "French", t
     merge_conflict_with: "Fusionner les conflits avec"
     no_changes: "Aucuns changements"
 
-  guide:
-    temp: "Temp"
+#  temp:
+#    ace_of_coders_tournament: "New: play in the Ace of Coders tournament now!"
 
   multiplayer:
     multiplayer_title: "Préférences multijoueurs" # We'll be changing this around significantly soon. Until then, it's not important to translate.

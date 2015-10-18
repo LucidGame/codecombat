@@ -31,6 +31,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     contact: "Contact"
     twitter_follow: "Urmărește"
     teachers: "Educatori"
+#    careers: "Careers"
 
   modal:
     close: "Inchide"
@@ -136,7 +137,6 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     save: "Salvează"
     publish: "Publică"
     create: "Creează"
-    manual: "Manual"
     fork: "Fork"
     play: "Joacă" # When used as an action verb, like "Play next level"
     retry: "Reîncearca"
@@ -159,10 +159,12 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     accepted: "Acceptat"
     rejected: "Respins"
     withdrawn: "Retrage"
+#    accept: "Accept"
+#    reject: "Reject"
+#    withdraw: "Withdraw"
     submitter: "Expeditor"
     submitted: "Expediat"
     commit_msg: "Înregistrează Mesajul"
-    review: "Revizuie"
     version_history: "Istoricul versiunilor"
     version_history_for: "Istoricul versiunilor pentru: "
     select_changes: "Selectați două schimbări de mai jos pentru a vedea diferenţa."
@@ -215,6 +217,8 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
 
   play_level:
     done: "Gata"
+#    next_game: "Next game"
+#    show_menu: "Show game menu"
     home: "Acasă" # Not used any more, will be removed soon.
     level: "Nivel" # Like "Level: Dungeons of Kithgard"
     skip: "Sari peste"
@@ -271,7 +275,6 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     tome_select_a_thang: "Alege pe cineva pentru "
     tome_available_spells: "Vrăji disponibile"
     tome_your_skills: "Skillurile tale"
-    tome_help: "Ajutor"
     tome_current_method: "Metoda curentă"
     hud_continue_short: "Continuă"
     code_saved: "Cod Salvat"
@@ -280,7 +283,6 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     loading_ready: "Gata!"
     loading_start: "Începe Level"
     problem_alert_title: "Repară codul"
-    problem_alert_help: "Ajutor"
     time_current: "Acum:"
     time_total: "Max:"
     time_goto: "Dute la:"
@@ -341,6 +343,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     tip_free_your_mind: "Trebuie sa lași totul, Neo. Frica, Îndoiala și necredința. Eliberează-ți mintea. ~Morpheus"
     tip_strong_opponents: "Și cei mai puternici dintre oponenți întodeauna au o slăbiciune. ~Itachi Uchiha"
 #    tip_paper_and_pen: "Before you start coding, you can always plan with a sheet of paper and a pen."
+#    solve_then_write: "First, solve the problem. Then, write the code. - John Johnson"
 
   game_menu:
     inventory_tab: "Inventar"
@@ -410,6 +413,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     feature7: "<strong>Clanuri</strong> private"
     free: "Gratuit"
     month: "lună"
+#    must_be_logged: "You must be logged in first. Please create an account or log in from the menu above."
     subscribe_title: "Abonează-te"
     unsubscribe: "Dezabonează-te"
     confirm_unsubscribe: "Confirmă Dezabonarea"
@@ -439,7 +443,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     payment_methods_blurb2: "Dacă aveți nevoie de o formă alternativă de plată, vă rugăm să ne contactați"
 #    sale_already_subscribed: "You're already subscribed!"
 #    sale_blurb1: "Save 35%"
-#    sale_blurb2: "off regular subscription price of $120 for a whole year!" # {changed}
+#    sale_blurb2: "off regular subscription price of $120 for a whole year!"
 #    sale_button: "Sale!"
 #    sale_button_title: "Save 35% when you purchase a 1 year subscription"
 #    sale_click_here: "Click Here"
@@ -462,7 +466,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     managed_by: "Gestionat de"
     will_be_cancelled: "Va fi anulat pe"
     currently_free: "Ai un abonament gratuit"
-    currently_free_until: "Ai un abonament gratuit până pe" # {changed}
+    currently_free_until: "Ai un abonament gratuit până pe"
     was_free_until: "Ai avut un abonament gratuit până pe"
     managed_subs: "Abonamente Gestionate"
     managed_subs_desc: "Adaugă abonamente pentru alți jucători (studenți, copii, etc.)"
@@ -526,6 +530,8 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
   skill_docs:
     writable: "permisiuni de scriere" # Hover over "attack" in Your Skills while playing a level to see most of this
     read_only: "permisiuni doar de citire"
+#    action: "Action"
+#    spell: "Spell"
     action_name: "nume"
     action_cooldown: "Ține"
     action_specific_cooldown: "Cooldown"
@@ -550,12 +556,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     volume_label: "Volum"
     music_label: "Muzică"
     music_description: "Oprește Muzica din fundal."
-    editor_config: "Editor Config"
     editor_config_title: "Configurare Editor"
-    editor_config_level_language_label: "Limbajul pentru acest nivel"
-    editor_config_level_language_description: "Definește limbajul de programare pentru acest nivel."
-    editor_config_default_language_label: "Limbajul de Programare Implicit"
-    editor_config_default_language_description: "Definește limbajul de programare în care vrei să scri codul când începi un nivel nou."
     editor_config_keybindings_label: "Mapare taste"
     editor_config_keybindings_default: "Implicit (Ace)"
     editor_config_keybindings_description: "Adaugă comenzi rapide suplimentare, cunoscute din editoarele obisnuite."
@@ -606,10 +607,11 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     intro_1: "CodeCombat este un joc online care te învață programare. Studenți scriu cod în limbaje de programare reale."
     intro_2: "Nu este nevoie de experiența în domeniu!"
     free_title: "Cât de mult costă?"
-    cost_china: "CodeCombat în China este gratis pentru primele 5 nivele, după care costă $9.99 USD pe lună pentru a accesa celelalte 140+ nivele pe serverele noaste exlusive din China."
+#    cost_premium_server: "CodeCombat is free for the first five levels, after which it costs $9.99 USD per month for access to our other 190+ levels on our exclusive country-specific servers."
     free_1: "Sunt 80+ de nivele GRATIS ce parcurg fiecare concept în programare." # {change}
     free_2: "Un abonament lunar oferă acces la tutoriale video si nivele extra pentru practică."
     teacher_subs_title: "Educatori primesc abonamente gratuite!"
+#    teacher_subs_0: "We offer free subscriptions to teachers for evaluation purposes."
     teacher_subs_1: "Te rugăm sa completezi"
     teacher_subs_2: "Chestionarul Educatorului"
     teacher_subs_3: "pentru a configura abonamentul."
@@ -634,7 +636,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     who_for_1: "Recomandăm CodeCombat pentru studenți cu vârsta de la 9 ani în sus. Nu este nevoie de experiență de programare."
     who_for_2: "Am proiectat CodeCombat pentru a atrage atât băieți cat si fete."
     material_title: "Cât de mult material conține?"
-    material_china: "Aproximativ 30 de ore de gameplay răspândite peste 140+ de nivele pentru abonați, si nivele noi în fiecare săptămână." # {change}
+    material_premium_server: "Aproximativ 30 de ore de gameplay răspândite peste 140+ de nivele pentru abonați, si nivele noi în fiecare săptămână." # {change}
     material_1: "Aproximativ 10 ore de material gratis si adițional 20 de ore în plus pentru abonați, cu nivele noi în fiecare săptămână." # {change}
     concepts_title: "Ce concepte sunt parcurse?"
     how_much_title: "Cât de mult costă un abonament lunar?"
@@ -838,6 +840,94 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     last_played: "Ultima oară cănd ai jucat"
 #    leagues_explanation: "Play in a league against other clan members in these multiplayer arena instances."
 
+#  courses:
+#    course: "Course"
+#    courses: "courses"
+#    not_enrolled: "You are not enrolled in this course."
+#    visit_pref: "Please visit the"
+#    visit_suf: "page to enroll."
+#    select_class: "Select one of your classes"
+#    unnamed: "*unnamed*"
+#    select: "Select"
+#    unnamed_class: "Unnamed Class"
+#    edit_settings: "edit class settings"
+#    edit_settings1: "Edit Class Settings"
+#    progress: "Class Progress"
+#    add_students: "Add Students"
+#    stats: "Statistics"
+#    total_students: "Total students:"
+#    average_time: "Average level play time:"
+#    total_time: "Total play time:"
+#    average_levels: "Average levels completed:"
+#    total_levels: "Total levels completed:"
+#    furthest_level: "Furthest level completed:"
+#    concepts_covered: "Concepts Covered"
+#    students: "Students"
+#    students1: "students"
+#    expand_details: "Expand details"
+#    concepts: "Concepts"
+#    levels: "levels"
+#    played: "Played"
+#    play_time: "Play time:"
+#    completed: "Completed:"
+#    invite_students: "Invite students to join this class."
+#    invite_link_header: "Link to join course"
+#    invite_link_p_1: "Give this link to students you would like to have join the course."
+#    invite_link_p_2: "Or have us email them directly:"
+#    capacity_used: "Course slots used:"
+#    enter_emails: "Enter student emails to invite, one per line"
+#    send_invites: "Send Invites"
+#    title: "Title"
+#    description: "Description"
+#    languages_available: "Select programming languages available to the class:"
+#    all_lang: "All Languages"
+#    show_progress: "Show student progress to everyone in the class"
+#    creating_class: "Creating class..."
+#    purchasing_course: "Purchasing course..."
+#    buy_course: "Buy Course"
+#    buy_course1: "Buy this course"
+#    create_class: "Create Class"
+#    select_all_courses: "Select 'All Courses' for a 50% discount!"
+#    all_courses: "All Courses"
+#    number_students: "Number of students"
+#    enter_number_students: "Enter the number of students you need for this class."
+#    name_class: "Name your class"
+#    displayed_course_page: "This will be displayed on the course page for you and your students. It can be changed later."
+#    buy: "Buy"
+#    purchasing_for: "You are purchasing a license for"
+#    creating_for: "You are creating a class for"
+#    for: "for" # Like in 'for 30 students'
+#    receive_code: "Afterwards you will receive an unlock code to distribute to your students, which they can use to enroll in your class."
+#    free_trial: "Free trial for teachers!"
+#    get_access: "to get individual access to all courses for evalutaion purposes."
+#    questions: "Questions?"
+#    faq: "Courses FAQ"
+#    question: "Q:" # Like in 'Question'
+#    question1: "What's the difference between these courses and the single player game?"
+#    answer: "A:" # Like in 'Answer'
+#    answer1: "The single player game is designed for individuals, while the courses are designed for classes."
+#    answer2: "The single player game has items, gems, hero selection, leveling up, and in-app purchases. Courses have classroom management features and streamlined student-focused level pacing."
+#    teachers_click: "Teachers Click Here"
+#    students_click: "Students Click Here"
+#    courses_on_coco: "Courses on CodeCombat"
+#    designed_to: "Courses are designed to introduce computer science concepts using CodeCombat's fun and engaging environment. CodeCombat levels are organized around key topics to encourage progressive learning, over the course of 5 hours."
+#    more_in_less: "Learn more in less time"
+#    no_experience: "No coding experience necesssary"
+#    easy_monitor: "Easily monitor student progress"
+#    purchase_for_class: "Purchase a course for your entire class. It's easy to sign up your students!"
+#    see_the: "See the"
+#    more_info: "for more information."
+#    choose_course: "Choose Your Course:"
+#    enter_code: "Enter an unlock code to join an existing class"
+#    enter_code1: "Enter unlock code"
+#    enroll: "Enroll"
+#    pick_from_classes: "Pick from your current classes"
+#    enter: "Enter"
+#    or: "Or"
+#    topics: "Topics"
+#    hours_content: "Hours of content:"
+#    get_free: "Get FREE course"
+
   classes:
     archmage_title: "Archmage"
     archmage_title_description: "(Programator)"
@@ -1028,9 +1118,9 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     simulation_explanation: "Simulând jocuri poți afla poziția în clasament a jocului tău mai repede!"
 #    simulation_explanation_leagues: "You will mainly help simulate games for allied players in your clans and courses."
     simulate_games: "Simulează Jocuri!"
-    simulate_all: "RESETEAZĂ ȘI SIMULEAZĂ JOCURI"
     games_simulated_by: "Jocuri simulate de tine:"
     games_simulated_for: "Jocuri simulate pentru tine:"
+#    games_in_queue: "Games currently in the queue:"
     games_simulated: "Jocuri simulate"
     games_played: "Jocuri jucate"
     ratio: "Rație"
@@ -1067,6 +1157,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     fight: "Luptă!"
     watch_victory: "Vizualizează victoria"
     defeat_the: "Învinge"
+#    watch_battle: "Watch the battle"
     tournament_started: ", a început"
     tournament_ends: "Turneul se termină"
     tournament_ended: "Turneul s-a terminat"
@@ -1074,10 +1165,16 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     tournament_blurb: "Scrie cod, colectează aur, construiește armate, distruge inamici, câștigă premii, si îmbunătățeșteți cariera în turneul Lăcomiei de $40,000! Află detalii"
     tournament_blurb_criss_cross: "Caștigă pariuri, creează căi, păcălește-ți oponenți, strâange Pietre Prețioase, si îmbunătățeșteți cariera in turneul Criss-Cross! Află detalii"
     tournament_blurb_zero_sum: "Dezlănțuie creativitatea de programare în strângerea de aur sau în tactici de bătălie în alpine mirror match dintre vrăitori roșii și cei albaștrii.Turneul începe Vineri, 27 Martie și se va desfăsura până Luni, 6 Aprilie la 5PM PDT. Află detalii"
+#    tournament_blurb_ace_of_coders: "Battle it out in the frozen glacier in this domination-style mirror match! The tournament began on Wednesday, September 16 and will run until Wednesday, October 14 at 5PM PDT. Check out the details"
     tournament_blurb_blog: "pe blogul nostru"
     rules: "Reguli"
     winners: "Învingători"
 #    league: "League"
+#    red_ai: "Red AI" # "Red AI Wins", at end of multiplayer match playback
+#    blue_ai: "Blue AI"
+#    wins: "Wins" # At end of multiplayer match playback
+#    humans: "Red" # Ladder page display team name
+#    ogres: "Blue"
 
   user:
     stats: "Statistici"
@@ -1117,6 +1214,8 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     recently_played: "Recent Jucat"
     no_recent_games: "Nici-un joc jucat de 2 săptămâni."
     payments: "Plăți"
+#    prepaid: "Prepaid"
+#    prepaid_codes: "Prepaid Codes"
     purchased: "Cumpărate"
 #    sale: "Sale"
     subscription: "Abonament"
@@ -1147,6 +1246,14 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     retrying: "Eroare server, reîncerc."
     success: "Plătit cu success. Mulțumim!"
 
+#  account_prepaid:
+#    purchase_code: "Purchase a Subscription Code"
+#    purchase_amount: "Amount"
+#    purchase_total: "Total"
+#    purchase_button: "Submit Purchase"
+#    your_codes: "Your Codes:"
+#    redeem_codes: "Redeem a Subscription Code"
+
   loading_error:
     could_not_load: "Eroare la încărcarea pe server"
     connection_failure: "Conexiune eșuată."
@@ -1159,6 +1266,7 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     bad_input: "Date greșite."
     server_error: "Eroare Server."
     unknown: "Eroare Necunoscută."
+#    error: "ERROR"
 
   resources:
     sessions: "Sesiuni"
@@ -1246,8 +1354,8 @@ module.exports = nativeDescription: "limba română", englishDescription: "Roman
     merge_conflict_with: "ÎBINĂ CONFLICTUL CU"
     no_changes: "Fară Schimbări"
 
-  guide:
-    temp: "Temp"
+#  temp:
+#    ace_of_coders_tournament: "New: play in the Ace of Coders tournament now!"
 
   multiplayer:
     multiplayer_title: "Setări Multiplayer" # We'll be changing this around significantly soon. Until then, it's not important to translate.

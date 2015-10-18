@@ -9,11 +9,12 @@ It's both a startup and a community project, completely open source under the [M
 
 ### [Getting Started](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-General-Information)
 
-We've made it easy to fork the project, run a simple script that'll install all the dependencies, and get a local copy of CodeCombat running right away on [Mac](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-Mac-and-Vagrant), [Linux](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-Linux), or [Windows](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-Windows). See [the docs for details](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-General-Information).
+We've made it easy to fork the project, run a simple script that'll install all the dependencies, and get a local copy of CodeCombat running right away on [Mac](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-Mac), [Linux](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-Linux), [Windows](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-Windows), or
+[Vagrant](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-Vagrant). See [the docs for details](https://github.com/codecombat/codecombat/wiki/Dev-Setup:-General-Information).
 
 ### [Getting In Touch](https://github.com/codecombat/codecombat/wiki/Developer-organization)
 
-Whether you're novice or pro, the CodeCombat team is ready to help you implement your ideas. Reach out on our [forum](http://discourse.codecombat.com), our [issue tracker](https://github.com/codecombat/codecombat/issues), or our [developer chat room](https://www.hipchat.com/g3plnOKqa), or see the docs for [more on how to contribute](https://github.com/codecombat/codecombat/wiki/Developer-organization).
+Whether you're novice or pro, the CodeCombat team is ready to help you implement your ideas. Reach out on our [forum](http://discourse.codecombat.com), our [issue tracker](https://github.com/codecombat/codecombat/issues), or our [developer chat room](https://www.hipchat.com/gkaufqwnj), or see the docs for [more on how to contribute](https://github.com/codecombat/codecombat/wiki/Developer-organization).
 
 ### [License](https://github.com/codecombat/codecombat/blob/master/LICENSE)
 

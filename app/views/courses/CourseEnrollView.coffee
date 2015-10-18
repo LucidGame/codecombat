@@ -2,10 +2,10 @@ app = require 'core/application'
 AuthModal = require 'views/core/AuthModal'
 CocoCollection = require 'collections/CocoCollection'
 Course = require 'models/Course'
-{getCoursesPrice} = require 'core/utils'
 RootView = require 'views/core/RootView'
 stripeHandler = require 'core/services/stripe'
 template = require 'templates/courses/course-enroll'
+utils = require 'core/utils'
 
 module.exports = class CourseEnrollView extends RootView
   id: 'course-enroll-view'
@@ -20,7 +20,7 @@ module.exports = class CourseEnrollView extends RootView
   subscriptions:
     'stripe:received-token': 'onStripeReceivedToken'
 
-  constructor: (options, @courseID=0) ->
+  constructor: (options, @courseID) ->
     super options
     @courseID ?= options.courseID
     @seats = 20
@@ -58,13 +58,14 @@ module.exports = class CourseEnrollView extends RootView
   onClickBuy: (e) ->
     return @openModalView new AuthModal() if me.isAnonymous()
 
-    if @seats < 1 or not _.isFinite(@seats)
-      alert("Please enter the maximum number of students needed for your class.")
-      return
-
     if @price is 0
+      @seats = 9999
       @state = 'creating'
       @createClass()
+      return
+
+    if @seats < 1 or not _.isFinite(@seats)
+      alert("Please enter the maximum number of students needed for your class.")
       return
 
     @state = undefined
@@ -78,7 +79,7 @@ module.exports = class CourseEnrollView extends RootView
       amount: @price
       description: "#{courseTitle} for #{@seats} students"
       bitcoin: true
-      alipay: if me.get('chinaVersion') or (me.get('preferredLanguage') or 'en-US')[...2] is 'zh' then true else 'auto'
+      alipay: if me.get('country') is 'china' or (me.get('preferredLanguage') or 'en-US')[...2] is 'zh' then true else 'auto'
 
   onStripeReceivedToken: (e) ->
     @state = 'purchasing'
@@ -99,9 +100,11 @@ module.exports = class CourseEnrollView extends RootView
 
   createClass: (token) ->
     data =
-      name: $('.class-name').val()
+      name: @className
       seats: @seats
-      token: token
+      stripe:
+        token: token
+        timestamp: new Date().getTime()
     data.courseID = @selectedCourse.id if @selectedCourse
     jqxhr = $.post('/db/course_instance/-/create', data)
     jqxhr.done (data, textStatus, jqXHR) =>
@@ -109,9 +112,14 @@ module.exports = class CourseEnrollView extends RootView
       # TODO: handle fetch errors
       me.fetch(cache: false).always =>
         courseID = @selectedCourse?.id ? @courses.models[0]?.id
-        viewArgs = if data?.length > 0 then [courseInstanceID: data[0]._id, courseID] else [{}, courseID]
+        route = "/courses/#{courseID}"
+        viewArgs = [{}, courseID]
+        if data?.length > 0
+          courseInstanceID = data[0]._id
+          route += "/#{courseInstanceID}"
+          viewArgs[0].courseInstanceID = courseInstanceID
         Backbone.Mediator.publish 'router:navigate',
-          route: "/courses/#{courseID}"
+          route: route
           viewClass: 'views/courses/CourseDetailsView'
           viewArgs: viewArgs
     jqxhr.fail (xhr, textStatus, errorThrown) =>
@@ -127,7 +135,8 @@ module.exports = class CourseEnrollView extends RootView
 
   renderNewPrice: ->
     if @selectedCourse
-      @price = getCoursesPrice([@selectedCourse], @seats)
+      coursePrices = [@selectedCourse.get('pricePerSeat')]
     else
-      @price = getCoursesPrice(@courses.models, @seats)
+      coursePrices = (c.get('pricePerSeat') for c in @courses.models)
+    @price = utils.getCourseBundlePrice(coursePrices, @seats)
     @render?()

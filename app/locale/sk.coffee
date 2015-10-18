@@ -31,6 +31,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     contact: "Kontakt"
     twitter_follow: "Sleduj na twitteri"
     teachers: "Učitelia"
+#    careers: "Careers"
 
   modal:
     close: "Zatvor"
@@ -136,7 +137,6 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     save: "Ulož"
     publish: "Publikuj"
     create: "Vytvoriť"
-    manual: "Manuál"
     fork: "Klonovať"
     play: "Hraj" # When used as an action verb, like "Play next level"
     retry: "Znova"
@@ -159,10 +159,12 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     accepted: "Prijaté"
     rejected: "Zamietnuté"
     withdrawn: "Uzatvorené"
+#    accept: "Accept"
+#    reject: "Reject"
+#    withdraw: "Withdraw"
     submitter: "Odosielateľ"
     submitted: "Odoslané"
     commit_msg: "Popis ukladania"
-    review: "Preskúmať"
     version_history: "História verzií"
     version_history_for: "História verzií pre: "
     select_changes: "Vyber dve zmeny pre porovnanie."
@@ -215,6 +217,8 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 
   play_level:
     done: "Hotovo"
+#    next_game: "Next game"
+#    show_menu: "Show game menu"
     home: "Domov" # Not used any more, will be removed soon.
     level: "Úroveň" # Like "Level: Dungeons of Kithgard"
     skip: "Preskočiť"
@@ -271,7 +275,6 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     tome_select_a_thang: "Zvoľte niekoho pre "
     tome_available_spells: "Dostupné kúzla"
     tome_your_skills: "Tvoje schopnosti"
-    tome_help: "Pomoc"
     tome_current_method: "Súčasná metóda"
     hud_continue_short: "Pokračovať"
     code_saved: "Kód uložený"
@@ -280,7 +283,6 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     loading_ready: "Pripravené!"
     loading_start: "Začať level"
     problem_alert_title: "Oprav svoj kód"
-    problem_alert_help: "Pomoc"
     time_current: "Teraz:"
     time_total: "Max:"
     time_goto: "Choď na:"
@@ -341,6 +343,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    tip_free_your_mind: "You have to let it all go, Neo. Fear, doubt, and disbelief. Free your mind. - Morpheus"
 #    tip_strong_opponents: "Even the strongest of opponents always has a weakness. - Itachi Uchiha"
 #    tip_paper_and_pen: "Before you start coding, you can always plan with a sheet of paper and a pen."
+#    solve_then_write: "First, solve the problem. Then, write the code. - John Johnson"
 
   game_menu:
     inventory_tab: "Inventár"
@@ -410,6 +413,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    feature7: "Private <strong>Clans</strong>"
     free: "Zdarma"
     month: "mesiac"
+#    must_be_logged: "You must be logged in first. Please create an account or log in from the menu above."
     subscribe_title: "Predplatné"
     unsubscribe: "Zrušiť predplatné"
     confirm_unsubscribe: "Potvrdiť zrušenie predplatného"
@@ -439,7 +443,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    payment_methods_blurb2: "If you require an alternate form of payment, please contact"
 #    sale_already_subscribed: "You're already subscribed!"
 #    sale_blurb1: "Save 35%"
-#    sale_blurb2: "off regular subscription price of $120 for a whole year!" # {changed}
+#    sale_blurb2: "off regular subscription price of $120 for a whole year!"
 #    sale_button: "Sale!"
 #    sale_button_title: "Save 35% when you purchase a 1 year subscription"
 #    sale_click_here: "Click Here"
@@ -462,7 +466,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    managed_by: "Managed by"
 #    will_be_cancelled: "Will be cancelled on"
 #    currently_free: "You currently have a free subscription"
-#    currently_free_until: "You currently have a subscription until" # {changed}
+#    currently_free_until: "You currently have a subscription until"
 #    was_free_until: "You had a free subscription until"
 #    managed_subs: "Managed Subscriptions"
 #    managed_subs_desc: "Add subscriptions for other players (students, children, etc.)"
@@ -526,6 +530,8 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
   skill_docs:
     writable: "zapisovatelné" # Hover over "attack" in Your Skills while playing a level to see most of this
     read_only: "iba na čítanie"
+#    action: "Action"
+#    spell: "Spell"
     action_name: "názov"
     action_cooldown: "Zaberie"
     action_specific_cooldown: "Cooldown"
@@ -550,12 +556,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     volume_label: "Halsitosť"
     music_label: "Hudba"
     music_description: "Vypnúť/zapnúť hudbu na pozadí."
-    editor_config: "Konfigurácia editora"
     editor_config_title: "Konfigurácia editora"
-    editor_config_level_language_label: "Jazyk pre túto úroveň"
-    editor_config_level_language_description: "Zvol programovací jazyk pre túto úroveň."
-    editor_config_default_language_label: "Predvolený programovací jazyk"
-    editor_config_default_language_description: "Zvol programovací jazyk, v ktorom chceš kódovať nové úrovne."
     editor_config_keybindings_label: "Klávesové skratky"
     editor_config_keybindings_default: "Predvolené (Ace)"
     editor_config_keybindings_description: "Pridáva skratky známe z bežných editorov."
@@ -606,10 +607,11 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     intro_1: "CodeCombat je online hra, ktorá učí programovať. Študenti píšu kód v skutočných programovacích jazykoch."
     intro_2: "Nie sú nutné žiadne predchádzajúce skúsenosti !"
     free_title: "Koľko to stojí ?"
-#    cost_china: "CodeCombat in China is free for the first five levels, after which it costs $9.99 USD per month for access to our other 180+ levels on our exclusive China servers."
+#    cost_premium_server: "CodeCombat is free for the first five levels, after which it costs $9.99 USD per month for access to our other 190+ levels on our exclusive country-specific servers."
     free_1: "CodeCombat Basic is ZDARMA ! K dispozícii je 70+ úrovní pokrývajúcich každý koncept." # {change}
     free_2: "Mesačné predplatné poskytuje prístup k videonávodom a k úrovniam na precvičenie navyše."
     teacher_subs_title: "Pre učiteľov je predplatné zdarma !"
+#    teacher_subs_0: "We offer free subscriptions to teachers for evaluation purposes."
     teacher_subs_1: "Napíšte na" # {change}
     teacher_subs_2: "pre zriadenie mesačného predplatného zdarma." # {change}
 #    teacher_subs_3: "to set up your subscription."
@@ -634,7 +636,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     who_for_1: "CodeCombat odporúčame pre žiakov od 9 rokov. Nie sú nutné žiadne predchádzajúce skúsenosti s programovaním."
     who_for_2: "CodeCombat sme navrhli tak, aby oslovil chlapcov aj dievčatá."
     material_title: "Aký je objem učebnej látky ?"
-#    material_china: "Approximately 40 hours of gameplay spread over 180+ subscriber-only levels so far."
+#    material_premium_server: "Approximately 50 hours of gameplay spread over 190+ subscriber-only levels so far."
     material_1: "Asi 8 hodín bezplatného obsahu a ďalších 14 hodín pre predplatiteľov. 5 nových úrovní každý týždeň." # {change}
     concepts_title: "Aké pojmy sú pokryté ?"
     how_much_title: "Koľko stojí mesačné predplatné ?"
@@ -838,6 +840,94 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    last_played: "Last played"
 #    leagues_explanation: "Play in a league against other clan members in these multiplayer arena instances."
 
+#  courses:
+#    course: "Course"
+#    courses: "courses"
+#    not_enrolled: "You are not enrolled in this course."
+#    visit_pref: "Please visit the"
+#    visit_suf: "page to enroll."
+#    select_class: "Select one of your classes"
+#    unnamed: "*unnamed*"
+#    select: "Select"
+#    unnamed_class: "Unnamed Class"
+#    edit_settings: "edit class settings"
+#    edit_settings1: "Edit Class Settings"
+#    progress: "Class Progress"
+#    add_students: "Add Students"
+#    stats: "Statistics"
+#    total_students: "Total students:"
+#    average_time: "Average level play time:"
+#    total_time: "Total play time:"
+#    average_levels: "Average levels completed:"
+#    total_levels: "Total levels completed:"
+#    furthest_level: "Furthest level completed:"
+#    concepts_covered: "Concepts Covered"
+#    students: "Students"
+#    students1: "students"
+#    expand_details: "Expand details"
+#    concepts: "Concepts"
+#    levels: "levels"
+#    played: "Played"
+#    play_time: "Play time:"
+#    completed: "Completed:"
+#    invite_students: "Invite students to join this class."
+#    invite_link_header: "Link to join course"
+#    invite_link_p_1: "Give this link to students you would like to have join the course."
+#    invite_link_p_2: "Or have us email them directly:"
+#    capacity_used: "Course slots used:"
+#    enter_emails: "Enter student emails to invite, one per line"
+#    send_invites: "Send Invites"
+#    title: "Title"
+#    description: "Description"
+#    languages_available: "Select programming languages available to the class:"
+#    all_lang: "All Languages"
+#    show_progress: "Show student progress to everyone in the class"
+#    creating_class: "Creating class..."
+#    purchasing_course: "Purchasing course..."
+#    buy_course: "Buy Course"
+#    buy_course1: "Buy this course"
+#    create_class: "Create Class"
+#    select_all_courses: "Select 'All Courses' for a 50% discount!"
+#    all_courses: "All Courses"
+#    number_students: "Number of students"
+#    enter_number_students: "Enter the number of students you need for this class."
+#    name_class: "Name your class"
+#    displayed_course_page: "This will be displayed on the course page for you and your students. It can be changed later."
+#    buy: "Buy"
+#    purchasing_for: "You are purchasing a license for"
+#    creating_for: "You are creating a class for"
+#    for: "for" # Like in 'for 30 students'
+#    receive_code: "Afterwards you will receive an unlock code to distribute to your students, which they can use to enroll in your class."
+#    free_trial: "Free trial for teachers!"
+#    get_access: "to get individual access to all courses for evalutaion purposes."
+#    questions: "Questions?"
+#    faq: "Courses FAQ"
+#    question: "Q:" # Like in 'Question'
+#    question1: "What's the difference between these courses and the single player game?"
+#    answer: "A:" # Like in 'Answer'
+#    answer1: "The single player game is designed for individuals, while the courses are designed for classes."
+#    answer2: "The single player game has items, gems, hero selection, leveling up, and in-app purchases. Courses have classroom management features and streamlined student-focused level pacing."
+#    teachers_click: "Teachers Click Here"
+#    students_click: "Students Click Here"
+#    courses_on_coco: "Courses on CodeCombat"
+#    designed_to: "Courses are designed to introduce computer science concepts using CodeCombat's fun and engaging environment. CodeCombat levels are organized around key topics to encourage progressive learning, over the course of 5 hours."
+#    more_in_less: "Learn more in less time"
+#    no_experience: "No coding experience necesssary"
+#    easy_monitor: "Easily monitor student progress"
+#    purchase_for_class: "Purchase a course for your entire class. It's easy to sign up your students!"
+#    see_the: "See the"
+#    more_info: "for more information."
+#    choose_course: "Choose Your Course:"
+#    enter_code: "Enter an unlock code to join an existing class"
+#    enter_code1: "Enter unlock code"
+#    enroll: "Enroll"
+#    pick_from_classes: "Pick from your current classes"
+#    enter: "Enter"
+#    or: "Or"
+#    topics: "Topics"
+#    hours_content: "Hours of content:"
+#    get_free: "Get FREE course"
+
   classes:
     archmage_title: "Arcimág"
     archmage_title_description: "(Programátor)"
@@ -1028,9 +1118,9 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     simulation_explanation: "Simulovaním sa dostane hra rýchlejšie do rebríčka !!"
 #    simulation_explanation_leagues: "You will mainly help simulate games for allied players in your clans and courses."
     simulate_games: "Simuluj hry !"
-    simulate_all: "RESETUJ A SIMULUJ HRY"
     games_simulated_by: "Tebou simulované hry:"
     games_simulated_for: "Pre teba simulované hry:"
+#    games_in_queue: "Games currently in the queue:"
     games_simulated: "Simulované hry"
     games_played: "Odohrané hry"
     ratio: "Pomer"
@@ -1067,6 +1157,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     fight: "Bojuj !"
     watch_victory: "Pozri si svoju výhru"
     defeat_the: "Poraz"
+#    watch_battle: "Watch the battle"
     tournament_started: ", spustený"
     tournament_ends: "Turnaj končí"
     tournament_ended: "Turnaj skončil"
@@ -1074,10 +1165,16 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
     tournament_blurb: "Píš kód, zbieraj mince, stavaj armády, rozdrv nepriateľov, vyhraj ceny v hodnote  40,000$. Greed tournament! Pozri sa na detaily."
     tournament_blurb_criss_cross: "Vyhraj ponuky, buduj cesty, preľsti súperov,zbieraj diamanty grab gems a vylepši svoju kariéru v našom Krížovkárskom turnaji ! Pozri sa na detaily"
     tournament_blurb_zero_sum: "Odviaž svoju kódovaciu kreativitu pri zbieraní mincí a bojovej taktike v spravodlivom vysokohorskom súboji medzi medzi červenou a modrou čarodejkou. Turnaj začal v piatok 27. marca 2015  a skončil 6. apríla 2015. Súťaž pre zábavu a slávu ! Pozri sa na detaily"
+#    tournament_blurb_ace_of_coders: "Battle it out in the frozen glacier in this domination-style mirror match! The tournament began on Wednesday, September 16 and will run until Wednesday, October 14 at 5PM PDT. Check out the details"
     tournament_blurb_blog: "v našom blogu."
     rules: "Pravidlá"
     winners: "Víťazi"
 #    league: "League"
+#    red_ai: "Red AI" # "Red AI Wins", at end of multiplayer match playback
+#    blue_ai: "Blue AI"
+#    wins: "Wins" # At end of multiplayer match playback
+#    humans: "Red" # Ladder page display team name
+#    ogres: "Blue"
 
   user:
     stats: "Stats"
@@ -1117,6 +1214,8 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    recently_played: "Recently Played"
 #    no_recent_games: "No games played during the past two weeks."
 #    payments: "Payments"
+#    prepaid: "Prepaid"
+#    prepaid_codes: "Prepaid Codes"
 #    purchased: "Purchased"
 #    sale: "Sale"
 #    subscription: "Subscription"
@@ -1147,6 +1246,14 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    retrying: "Server error, retrying."
 #    success: "Successfully paid. Thanks!"
 
+#  account_prepaid:
+#    purchase_code: "Purchase a Subscription Code"
+#    purchase_amount: "Amount"
+#    purchase_total: "Total"
+#    purchase_button: "Submit Purchase"
+#    your_codes: "Your Codes:"
+#    redeem_codes: "Redeem a Subscription Code"
+
 #  loading_error:
 #    could_not_load: "Error loading from server"
 #    connection_failure: "Connection failed."
@@ -1159,6 +1266,7 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    bad_input: "Bad input."
 #    server_error: "Server error."
 #    unknown: "Unknown error."
+#    error: "ERROR"
 
 #  resources:
 #    sessions: "Sessions"
@@ -1246,8 +1354,8 @@ module.exports = nativeDescription: "slovenčina", englishDescription: "Slovak",
 #    merge_conflict_with: "MERGE CONFLICT WITH"
 #    no_changes: "No Changes"
 
-#  guide:
-#    temp: "Temp"
+#  temp:
+#    ace_of_coders_tournament: "New: play in the Ace of Coders tournament now!"
 
 #  multiplayer:
 #    multiplayer_title: "Multiplayer Settings" # We'll be changing this around significantly soon. Until then, it's not important to translate.

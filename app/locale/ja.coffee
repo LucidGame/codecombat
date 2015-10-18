@@ -31,6 +31,7 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     contact: "お問い合わせ"
     twitter_follow: "フォロー"
     teachers: "教育関係者"
+#    careers: "Careers"
 
   modal:
     close: "閉じる"
@@ -136,7 +137,6 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     save: "セーブ"
     publish: "発行"
     create: "作成"
-    manual: "手動"
     fork: "分かれ"
     play: "ゲームスタート" # When used as an action verb, like "Play next level"
     retry: "リトライ"
@@ -159,10 +159,12 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     accepted: "容認された"
     rejected: "拒否された"
     withdrawn: "取り下げられました"
+#    accept: "Accept"
+#    reject: "Reject"
+#    withdraw: "Withdraw"
     submitter: "提出者"
     submitted: "提出されました"
     commit_msg: "コミットメッセージ"
-    review: "レビュー"
     version_history: "バージョン履歴"
     version_history_for: "バージョン履歴："
     select_changes: "違いを見るには以下の二つの変更を選んで下さい"
@@ -215,6 +217,8 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 
   play_level:
     done: "完了"
+#    next_game: "Next game"
+#    show_menu: "Show game menu"
     home: "ホーム" # Not used any more, will be removed soon.
     level: "ゲームレベル" # Like "Level: Dungeons of Kithgard"
     skip: "スキップ"
@@ -255,8 +259,8 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     victory_new_item: "ニューアイテム"
     victory_viking_code_school: "あなたはハードレベルのホーリー・スモークを打ち破りました! もしあなたが既にソフトウェア開発者でないなら, ぜひやってみましょう. あなたはちょうどViking Code Scoolで受け入れられるための出世街道にいます,そこでは次のレベルへのスキルを取得でき、14週間でプロのWeb開発者になれます。"
     victory_become_a_viking: "バイキングになる"
-#    victory_bloc: "Great work! Your skills are improving, and someone's taking notice. If you've considered becoming a software developer, this may be your lucky day. Bloc is an online bootcamp that pairs you 1-on-1 with an expert mentor who will help train you into a professional developer! By beating A Mayhem of Munchkins, you're now eligible for a $500 price reduction with the code: CCRULES"
-#    victory_bloc_cta: "Meet your mentor – learn about Bloc"
+    victory_bloc: "すばらしい偉業ですね！あなたのスキルは伸びています、そしてそれに注目している人もいます。もしあなたがソフトウェア開発者になろうと考えているなら今日は幸運な日です。Blocはエキスパートのメンターが一対一であなたをプロの開発者に訓練するブートキャンプです！Mayhem of Munchkinsを倒したあなたはコードにより500ドルの割引の対象となっています。: CCRULES"
+    victory_bloc_cta: "あなたのメンターに会う – Blockについて学ぶ"
     guide_title: "ガイド"
     tome_minion_spells: "操作できるキャラクターの呪文" # Only in old-style levels.
     tome_read_only_spells: "読込専用の呪文" # Only in old-style levels.
@@ -271,7 +275,6 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     tome_select_a_thang: "誰かを選択: "
     tome_available_spells: "利用できる呪文"
     tome_your_skills: "あなたのスキル"
-    tome_help: "ヘルプ"
     tome_current_method: "現在のメソッド"
     hud_continue_short: "コンテニュー"
     code_saved: "コードがセーブされました"
@@ -280,7 +283,6 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     loading_ready: "準備完了！"
     loading_start: "レベルスタート"
     problem_alert_title: "コードを修正して下さい"
-    problem_alert_help: "ヘルプ"
     time_current: "今："
     time_total: "最大："
     time_goto: "行く："
@@ -341,6 +343,7 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     tip_free_your_mind: "全ての雑念を捨てろ、恐怖、疑いも不信も 心を解き放つんだ - モーフィアス"
     tip_strong_opponents: "どんな強者にも弱点というものはあるんだ… - うちは　イタチ"
     tip_paper_and_pen: "コーディングを始める前に, 必ず紙とペンを用意して計画を立てましょう。"
+#    solve_then_write: "First, solve the problem. Then, write the code. - John Johnson"
 
   game_menu:
     inventory_tab: "インベントリー"
@@ -401,15 +404,16 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 
   subscribe:
     comparison_blurb: "CodeCombatへ課金してスキルを磨きましょう！"
-    feature1: "100以上の基本レベルが４つの世界に" # {change}
+    feature1: "110以上の基本レベルが４つの世界に" # {change}
     feature2: "10人のパワフルな <strong>ニューヒーロー</strong> とユニークなスキル!" # {change}
-    feature3: "70以上のボーナスレベル"
+    feature3: "70以上のボーナスレベル" # {change}
     feature4: "<strong>3500のジェム</strong>が毎月ボーナス!"
     feature5: "ビデオチュートリアル"
     feature6: "プレミアムメールサポート"
     feature7: "プライベート<strong>クラン</strong>"
     free: "無料"
     month: "月"
+#    must_be_logged: "You must be logged in first. Please create an account or log in from the menu above."
     subscribe_title: "課金"
     unsubscribe: "無課金"
     confirm_unsubscribe: "課金の解約確認"
@@ -439,7 +443,7 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    payment_methods_blurb2: "If you require an alternate form of payment, please contact"
 #    sale_already_subscribed: "You're already subscribed!"
 #    sale_blurb1: "Save 35%"
-#    sale_blurb2: "off regular subscription price of $120 for a whole year!" # {changed}
+#    sale_blurb2: "off regular subscription price of $120 for a whole year!"
 #    sale_button: "Sale!"
 #    sale_button_title: "Save 35% when you purchase a 1 year subscription"
 #    sale_click_here: "Click Here"
@@ -462,7 +466,7 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    managed_by: "Managed by"
 #    will_be_cancelled: "Will be cancelled on"
 #    currently_free: "You currently have a free subscription"
-#    currently_free_until: "You currently have a subscription until" # {changed}
+#    currently_free_until: "You currently have a subscription until"
 #    was_free_until: "You had a free subscription until"
 #    managed_subs: "Managed Subscriptions"
 #    managed_subs_desc: "Add subscriptions for other players (students, children, etc.)"
@@ -526,6 +530,8 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
   skill_docs:
     writable: "書き込み可能な" # Hover over "attack" in Your Skills while playing a level to see most of this
     read_only: "リードオンリー"
+#    action: "Action"
+#    spell: "Spell"
     action_name: "ネーム"
     action_cooldown: "テイク"
     action_specific_cooldown: "クールダウン"
@@ -550,12 +556,7 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     volume_label: "音量"
     music_label: "音楽"
     music_description: "BGM をオン/オフ"
-    editor_config: "エディター設定"
     editor_config_title: "エディターの設定"
-    editor_config_level_language_label: "このレベルの言語"
-    editor_config_level_language_description: "このレベルのプログラミング言語を定義する。"
-    editor_config_default_language_label: "デフォルトプログラミング言語"
-    editor_config_default_language_description: "新しいレベルの起動時に、書きたいプログラミング言語を設定する。"
     editor_config_keybindings_label: "キーバインディング"
     editor_config_keybindings_default: "デフォルト(エース)"
     editor_config_keybindings_description: "一般的なエディターから知られているショートカットを追加する。"
@@ -606,35 +607,36 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     intro_1: "CodeCombat はプログラミングを教えるオンラインゲームです。生徒は本物のプログラム言語を書きます。"
     intro_2: "プログラミングの経験は必要ありません！"
     free_title: "価格について"
-#    cost_china: "CodeCombat in China is free for the first five levels, after which it costs $9.99 USD per month for access to our other 180+ levels on our exclusive China servers."
-    free_1: "CodeCombat は基本的に無料です！100以上のレベルが無料です。" # {change}
+#    cost_premium_server: "CodeCombat is free for the first five levels, after which it costs $9.99 USD per month for access to our other 190+ levels on our exclusive country-specific servers."
+    free_1: "CodeCombat は基本的に無料です！110以上のレベルが無料です。" # {change}
     free_2: "月々の課金をするとビデオのチュートリアルにアクセスでき、また追加のレベルが楽しめます。"
     teacher_subs_title: "教育関係者は無料のサブスクリプションを得ることができます！"
+#    teacher_subs_0: "We offer free subscriptions to teachers for evaluation purposes."
     teacher_subs_1: "" # {change}
     teacher_subs_2: "に連絡して無料の月々のサブスクリプションを得ましょう。" # {change}
 #    teacher_subs_3: "to set up your subscription."
     sub_includes_title: "サブスクリプションの内容について"
-    sub_includes_1: "100以上の基本レベルに加えて、生徒は月々のサブスクリプションを得て次の機能が使えます:" # {change}
-    sub_includes_2: "70以上の練習レベル"
+    sub_includes_1: "110以上の基本レベルに加えて、生徒は月々のサブスクリプションを得て次の機能が使えます:" # {change}
+    sub_includes_2: "70以上の練習レベル" # {change}
     sub_includes_3: "ビデオチュートリアル"
     sub_includes_4: "メールによるサポート"
     sub_includes_5: "10人の新しいヒーローとマスターのユニークなスキル" # {change}
     sub_includes_6: "3500のジェムが月々支給されます"
     sub_includes_7: "プライベートクラン"
-#    monitor_progress_title: "How do I monitor student progress?"
-#    monitor_progress_1: "Student progress can be monitored by creating a"
-#    monitor_progress_2: "for your class."
-#    monitor_progress_3: "To add a student, send them the invite link for your Clan, which is on the"
-#    monitor_progress_4: "page."
-#    monitor_progress_5: "After they join, you will see a summary of the student's progress on your Clan's page."
-#    private_clans_1: "Private Clans provide increased privacy and detailed progress information for each student."
-#    private_clans_2: "To create a private Clan, check the 'Make clan private' checkbox when creating a"
-#    private_clans_3: "."
+    monitor_progress_title: "生徒の進捗状況を確認するにはどうすればよいですか？"
+    monitor_progress_1: "生徒の進捗状況を確認するには"
+    monitor_progress_2: "クラスをつくります。"
+    monitor_progress_3: "生徒を追加するには, あなたのクランの招待リンクを送信します, 招待リンクは"
+    monitor_progress_4: "ページ上にあります。"
+    monitor_progress_5: "生徒が参加したら, クランページで生徒の進捗状況の概要が表示されます。"
+    private_clans_1: "プライベートクランは各学生のプライバシーが向上し進捗情報が詳細化しています。"
+    private_clans_2: "プライベートクランを作るには, "
+    private_clans_3: "を作成するとき、'クランをプライベートにする'のチェックボックスをチェックします。"
     who_for_title: "CodeCombat が必要なひと"
     who_for_1: "私たちは CodeCombat を9歳以上の生徒にオススメしています。プログラミングの経験は必要ありません。"
     who_for_2: "私たちは男女問わず遊べるように CodeCombat をデザインしました。"
     material_title: "どのぐらいコンテンツがありますか？"
-#    material_china: "Approximately 40 hours of gameplay spread over 180+ subscriber-only levels so far."
+#    material_premium_server: "Approximately 50 hours of gameplay spread over 190+ subscriber-only levels so far."
     material_1: "8時間ほどの無料のコンテンツに加え、サブスクリプションによってさらに14時間ほどプレイすることができ、毎週5つの新しいレベルが追加されています。" # {change}
     concepts_title: "どのような概念がカバーされているかについて"
     how_much_title: "月々のサブスクリプションはいくらですか？"
@@ -765,14 +767,14 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     continue_script: "以前のスクリプトを続ける。"
     skip_scripts: "過去のスキップできるスクリプトをスキップする。"
     toggle_playback: "トグル:プレイ/ポーズ"
-#    scrub_playback: "Scrub back and forward through time."
-#    single_scrub_playback: "Scrub back and forward through time by a single frame."
-#    scrub_execution: "Scrub through current spell execution."
-#    toggle_debug: "Toggle debug display."
-#    toggle_grid: "Toggle grid overlay."
-#    toggle_pathfinding: "Toggle pathfinding overlay."
-#    beautify: "Beautify your code by standardizing its formatting."
-#    maximize_editor: "Maximize/minimize code editor."
+    scrub_playback: "早戻し・早送り."
+    single_scrub_playback: "１フレームごとに早戻し・早送りをする。"
+    scrub_execution: "現在のスペルの実行まで早戻し・早送り。"
+    toggle_debug: "トグル：ディスプレイのデバッグ"
+    toggle_grid: "トグル：オーバーレイをグリッド"
+    toggle_pathfinding: "トグル：オーバーレイの経路探索"
+    beautify: "フォーマットを標準化してコードを美しくする。"
+    maximize_editor: "コードエディターの最大化/最小化。"
 
   community:
     main_title: "CodeCombatコミュニティー"
@@ -836,7 +838,95 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
     latest_achievement: "最新業績"
     playtime: "プレイ時間"
     last_played: "最終プレイ"
-#    leagues_explanation: "Play in a league against other clan members in these multiplayer arena instances."
+    leagues_explanation: "リーグで他のマルチアリーナインスタンス内の他のクランメンバーとプレイ"
+
+#  courses:
+#    course: "Course"
+#    courses: "courses"
+#    not_enrolled: "You are not enrolled in this course."
+#    visit_pref: "Please visit the"
+#    visit_suf: "page to enroll."
+#    select_class: "Select one of your classes"
+#    unnamed: "*unnamed*"
+#    select: "Select"
+#    unnamed_class: "Unnamed Class"
+#    edit_settings: "edit class settings"
+#    edit_settings1: "Edit Class Settings"
+#    progress: "Class Progress"
+#    add_students: "Add Students"
+#    stats: "Statistics"
+#    total_students: "Total students:"
+#    average_time: "Average level play time:"
+#    total_time: "Total play time:"
+#    average_levels: "Average levels completed:"
+#    total_levels: "Total levels completed:"
+#    furthest_level: "Furthest level completed:"
+#    concepts_covered: "Concepts Covered"
+#    students: "Students"
+#    students1: "students"
+#    expand_details: "Expand details"
+#    concepts: "Concepts"
+#    levels: "levels"
+#    played: "Played"
+#    play_time: "Play time:"
+#    completed: "Completed:"
+#    invite_students: "Invite students to join this class."
+#    invite_link_header: "Link to join course"
+#    invite_link_p_1: "Give this link to students you would like to have join the course."
+#    invite_link_p_2: "Or have us email them directly:"
+#    capacity_used: "Course slots used:"
+#    enter_emails: "Enter student emails to invite, one per line"
+#    send_invites: "Send Invites"
+#    title: "Title"
+#    description: "Description"
+#    languages_available: "Select programming languages available to the class:"
+#    all_lang: "All Languages"
+#    show_progress: "Show student progress to everyone in the class"
+#    creating_class: "Creating class..."
+#    purchasing_course: "Purchasing course..."
+#    buy_course: "Buy Course"
+#    buy_course1: "Buy this course"
+#    create_class: "Create Class"
+#    select_all_courses: "Select 'All Courses' for a 50% discount!"
+#    all_courses: "All Courses"
+#    number_students: "Number of students"
+#    enter_number_students: "Enter the number of students you need for this class."
+#    name_class: "Name your class"
+#    displayed_course_page: "This will be displayed on the course page for you and your students. It can be changed later."
+#    buy: "Buy"
+#    purchasing_for: "You are purchasing a license for"
+#    creating_for: "You are creating a class for"
+#    for: "for" # Like in 'for 30 students'
+#    receive_code: "Afterwards you will receive an unlock code to distribute to your students, which they can use to enroll in your class."
+#    free_trial: "Free trial for teachers!"
+#    get_access: "to get individual access to all courses for evalutaion purposes."
+#    questions: "Questions?"
+#    faq: "Courses FAQ"
+#    question: "Q:" # Like in 'Question'
+#    question1: "What's the difference between these courses and the single player game?"
+#    answer: "A:" # Like in 'Answer'
+#    answer1: "The single player game is designed for individuals, while the courses are designed for classes."
+#    answer2: "The single player game has items, gems, hero selection, leveling up, and in-app purchases. Courses have classroom management features and streamlined student-focused level pacing."
+#    teachers_click: "Teachers Click Here"
+#    students_click: "Students Click Here"
+#    courses_on_coco: "Courses on CodeCombat"
+#    designed_to: "Courses are designed to introduce computer science concepts using CodeCombat's fun and engaging environment. CodeCombat levels are organized around key topics to encourage progressive learning, over the course of 5 hours."
+#    more_in_less: "Learn more in less time"
+#    no_experience: "No coding experience necesssary"
+#    easy_monitor: "Easily monitor student progress"
+#    purchase_for_class: "Purchase a course for your entire class. It's easy to sign up your students!"
+#    see_the: "See the"
+#    more_info: "for more information."
+#    choose_course: "Choose Your Course:"
+#    enter_code: "Enter an unlock code to join an existing class"
+#    enter_code1: "Enter unlock code"
+#    enroll: "Enroll"
+#    pick_from_classes: "Pick from your current classes"
+#    enter: "Enter"
+#    or: "Or"
+#    topics: "Topics"
+#    hours_content: "Hours of content:"
+#    get_free: "Get FREE course"
 
   classes:
     archmage_title: "アークメイジ"
@@ -1028,9 +1118,9 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    simulation_explanation: "By simulating games you can get your game ranked faster!"
 #    simulation_explanation_leagues: "You will mainly help simulate games for allied players in your clans and courses."
 #    simulate_games: "Simulate Games!"
-#    simulate_all: "RESET AND SIMULATE GAMES"
 #    games_simulated_by: "Games simulated by you:"
 #    games_simulated_for: "Games simulated for you:"
+#    games_in_queue: "Games currently in the queue:"
 #    games_simulated: "Games simulated"
 #    games_played: "Games played"
     ratio: "比率  "
@@ -1067,6 +1157,7 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    fight: "Fight!"
 #    watch_victory: "Watch your victory"
 #    defeat_the: "Defeat the"
+#    watch_battle: "Watch the battle"
 #    tournament_started: ", started"
 #    tournament_ends: "Tournament ends"
 #    tournament_ended: "Tournament ended"
@@ -1074,10 +1165,16 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    tournament_blurb: "Write code, collect gold, build armies, crush foes, win prizes, and upgrade your career in our $40,000 Greed tournament! Check out the details"
 #    tournament_blurb_criss_cross: "Win bids, construct paths, outwit opponents, grab gems, and upgrade your career in our Criss-Cross tournament! Check out the details"
 #    tournament_blurb_zero_sum: "Unleash your coding creativity in both gold gathering and battle tactics in this alpine mirror match between red sorcerer and blue sorcerer. The tournament began on Friday, March 27 and will run until Monday, April 6 at 5PM PDT. Compete for fun and glory! Check out the details"
+#    tournament_blurb_ace_of_coders: "Battle it out in the frozen glacier in this domination-style mirror match! The tournament began on Wednesday, September 16 and will run until Wednesday, October 14 at 5PM PDT. Check out the details"
 #    tournament_blurb_blog: "on our blog"
     rules: "ルール"
     winners: "勝者"
-#    league: "League"
+    league: "リーグ"
+#    red_ai: "Red AI" # "Red AI Wins", at end of multiplayer match playback
+#    blue_ai: "Blue AI"
+#    wins: "Wins" # At end of multiplayer match playback
+#    humans: "Red" # Ladder page display team name
+#    ogres: "Blue"
 
   user:
     stats: "ステータス"
@@ -1117,6 +1214,8 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    recently_played: "Recently Played"
 #    no_recent_games: "No games played during the past two weeks."
 #    payments: "Payments"
+#    prepaid: "Prepaid"
+#    prepaid_codes: "Prepaid Codes"
 #    purchased: "Purchased"
 #    sale: "Sale"
 #    subscription: "Subscription"
@@ -1147,6 +1246,14 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    retrying: "Server error, retrying."
 #    success: "Successfully paid. Thanks!"
 
+#  account_prepaid:
+#    purchase_code: "Purchase a Subscription Code"
+#    purchase_amount: "Amount"
+#    purchase_total: "Total"
+#    purchase_button: "Submit Purchase"
+#    your_codes: "Your Codes:"
+#    redeem_codes: "Redeem a Subscription Code"
+
 #  loading_error:
 #    could_not_load: "Error loading from server"
 #    connection_failure: "Connection failed."
@@ -1159,6 +1266,7 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    bad_input: "Bad input."
 #    server_error: "Server error."
 #    unknown: "Unknown error."
+#    error: "ERROR"
 
 #  resources:
 #    sessions: "Sessions"
@@ -1246,8 +1354,8 @@ module.exports = nativeDescription: "日本語", englishDescription: "Japanese",
 #    merge_conflict_with: "MERGE CONFLICT WITH"
 #    no_changes: "No Changes"
 
-  guide:
-    temp: "テンポラリー"
+#  temp:
+#    ace_of_coders_tournament: "New: play in the Ace of Coders tournament now!"
 
   multiplayer:
     multiplayer_title: "マルチプレイ設定" # We'll be changing this around significantly soon. Until then, it's not important to translate.
