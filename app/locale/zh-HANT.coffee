@@ -31,7 +31,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     contact: "聯繫我們"
     twitter_follow: "在 Twitter 關注"
     teachers: "教師"
-#    careers: "Careers"
+    careers: "招聘"
 
   modal:
     close: "關閉"
@@ -158,10 +158,10 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     pending: "處理中"
     accepted: "已接受"
     rejected: "未接受"
-    withdrawn: "撤回"
-#    accept: "Accept"
-#    reject: "Reject"
-#    withdraw: "Withdraw"
+    withdrawn: "已撤回"
+    accept: "接受"
+    reject: "拒絕"
+    withdraw: "撤回"
     submitter: "提交者"
     submitted: "已提交"
     commit_msg: "送出訊息"
@@ -217,8 +217,8 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
 
   play_level:
     done: "完成"
-#    next_game: "Next game"
-#    show_menu: "Show game menu"
+    next_game: "下一個遊戲"
+    show_menu: "顯示遊戲菜單"
     home: "首頁" # Not used any more, will be removed soon.
     level: "關卡" # Like "Level: Dungeons of Kithgard"
     skip: "跳過"
@@ -343,7 +343,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     tip_free_your_mind: "放下一切私心雜念，丟棄害怕、疑問和拒信，解放您的思維。 - 莫菲斯《駭客任務》"
     tip_strong_opponents: "即使是最强大的對手也有弱点的。 - 宇智波鼬《火影忍者》"
     tip_paper_and_pen: "在您開始編碼之前，您可以隨時用一張紙和一支筆作計劃。"
-#    solve_then_write: "First, solve the problem. Then, write the code. - John Johnson"
+#    tip_solve_then_write: "First, solve the problem. Then, write the code. - John Johnson"
 
   game_menu:
     inventory_tab: "倉庫"
@@ -485,7 +485,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     users_subscribed: "用戶訂閱："
     no_users_subscribed: "沒有用戶訂閱，請仔細檢查您的電子郵件地址。"
     current_recipients: "當前收件人"
-    unsubscribing: "取消訂閱中・・・"
+    unsubscribing: "取消訂閱中・・・" # {change}
     subscribe_prepaid: "點擊訂閱來使用預付代碼"
     using_prepaid: "使用預付費代碼進行每月訂閱"
 
@@ -603,7 +603,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     retrostyle_blurb: "復古風格的遊戲"
 
   teachers:
-    title: "CodeCombat致教師的說明"
+    more_info: "致教師的說明"
     intro_1: "CodeCombat 是一個教編程的網上游戲。學生會用編程語言寫代碼。"
     intro_2: "無需經驗！"
     free_title: "要多少錢？"
@@ -792,7 +792,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     social_facebook: "關注CodeCombat的Facebook"
     social_twitter: "關注CodeCombat的Twitter"
     social_gplus: "關注CodeCombat的Google+"
-    social_hipchat: "通過公共的HipChat與我們交流"
+    social_hipchat: "通過公共的Slack與我們交流"
     contribute_to_the_project: "貢獻這專案"
 
   clans:
@@ -839,6 +839,19 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     playtime: "遊戲時間"
     last_played: "最後玩了"
     leagues_explanation: "在部落裡與其他成員組成聯盟一起參加下面的多人競技場。"
+#    track_concepts1: "Track concepts"
+#    track_concepts2a: "learned by each student"
+#    track_concepts2b: "learned by each member"
+#    track_concepts3a: "Track levels completed for each student"
+#    track_concepts3b: "Track levels completed for each member"
+#    track_concepts4a: "See your students'"
+#    track_concepts4b: "See your members'"
+#    track_concepts5: "solutions"
+#    track_concepts6a: "Sort students by name or progress"
+#    track_concepts6b: "Sort members by name or progress"
+#    track_concepts7: "Requires invitation"
+#    track_concepts8: "to join"
+#    private_require_sub: "Private clans require a subscription to create or join."
 
   courses:
     course: "課程"
@@ -869,15 +882,15 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     levels: "關卡"
     played: "已通關"
     play_time: "遊戲時間："
-    completed: "遊戲時間："
+    completed: "完成："
     invite_students: "邀請學生加入此課堂。"
     invite_link_header: "參與課堂的縺結"
-    invite_link_p_1: "把這個參與課堂的連結發給你認可的學生。"
+    invite_link_p_1: "把這個參與課堂的連結發給你的學生。"
     invite_link_p_2: "或讓我們代你直接發送電郵："
-    capacity_used: "Course slots used:"
+    capacity_used: "課堂插槽己用："
     enter_emails: "輸入學生電郵地址來邀請，每行一個"
     send_invites: "發送邀請"
-    title: "發送邀請"
+    title: "標題"
     description: "描述"
     languages_available: "選擇編程語言："
     all_lang: "所有編程語言"
@@ -890,7 +903,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     select_all_courses: "可半價一次購買所有課程！"
     all_courses: "所有課程"
     number_students: "學生人數"
-    enter_number_students: "輪入該課堂的學生上限人數"
+    enter_number_students: "輸入該課堂的學生上限人數"
     name_class: "命名您的課堂"
     displayed_course_page: "這將會在課程頁面顯示，可被修改。"
     buy: "購買"
@@ -910,7 +923,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     teachers_click: "老師點擊這裡"
     students_click: "學生點擊這裡"
     courses_on_coco: "CodeCombat上的課程"
-    designed_to: "CodeCombat課程的宗旨是在使用CodeCombat生動有趣的環境下教授計算機科學的課目。整個CodeCombat的關卡是圍繞著計算機科學的重點並激勵學生們自主向上學習在5小時的過程。"
+    designed_to: "CodeCombat課程的宗旨是在使用CodeCombat生動有趣的環境下教授計算機科學的課目。整個CodeCombat的關卡是圍繞著計算機科學的重點，並激勵學生們自主向上學習在5小時的過程內。"
     more_in_less: "以最少的時間學習最多的知識"
     no_experience: "無需編程經驗"
     easy_monitor: "容易管理學生的進程"
@@ -918,11 +931,11 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     see_the: "詳細資訊請看"
     more_info: "。"
     choose_course: "選擇您的課程："
-    enter_code: "輸入一個解銷碼" # {change}
-    enter_code1: "輸入解銷碼"
+    enter_code: "輸入一個解鎖碼來加入已存在的課堂"
+    enter_code1: "輸入解鎖碼"
     enroll: "註冊"
     pick_from_classes: "從目前的課程選擇"
-    enter: "輪入"
+    enter: "輸入"
     or: "或"
     topics: "題目"
     hours_content: "內容時間："
@@ -1059,7 +1072,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     join_desc_3: "， 或者找到我們在"
     join_desc_4: "讓我們從這開始!"
     join_url_email: "發信給我們"
-    join_url_hipchat: "公共的HipChat房間"
+    join_url_hipchat: "公共的Slack房間"
     archmage_subscribe_desc: "取得郵件關於新的編程機會和公告。"
     artisan_introduction_pref: "我們必須建造更多的關卡! 大家為了更多的內容在高聲吶喊， 但只靠我們只能建造這麼多。 現在您的工作場所就是一關; 我們的關卡編輯器是勉強可用的, 所以請小心. 只要您有新的靈感，不論從簡單的 for-loops 到"
     artisan_introduction_suf: "， 那個這職業會適合您。"
@@ -1069,7 +1082,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     artisan_join_desc: "按照以下步驟使用關卡編輯器:"
     artisan_join_step1: "閱讀文擋。"
     artisan_join_step2: "創建新的關卡並且探索已存在的關卡。"
-    artisan_join_step3: "在公共的HipChat房間裡找到我們尋求幫助。"
+    artisan_join_step3: "在公共的Slack房間裡找到我們尋求幫助。"
     artisan_join_step4: "公佈您的關卡到論壇中尋求回饋。"
     artisan_subscribe_desc: "取得郵件關於關卡編輯器更新和公告。"
     adventurer_introduction: "讓我們清楚的定義您的角色: 您是部坦克。 您將遭受許多傷害。 我們需要玩家來嘗試我們全新的關卡並且幫助我們找出如何讓事情變得更好。 那痛苦將是巨大的; 製作優秀的遊戲是個長遠的過程並且沒有人可以第一次就把事情做對。 如果您可以忍受並且抵抗力高， 那麼這職業也許適合您。"
@@ -1120,7 +1133,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     simulate_games: "模擬遊戲!"
     games_simulated_by: "您模擬過的次數:"
     games_simulated_for: "替您模擬的次數:"
-#    games_in_queue: "Games currently in the queue:"
+    games_in_queue: "遊戲正在列隊中："
     games_simulated: "遊戲已模擬"
     games_played: "玩過的遊戲"
     ratio: "通過率"
@@ -1157,7 +1170,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     fight: "戰鬥!"
     watch_victory: "觀看您的勝利"
     defeat_the: "擊敗"
-#    watch_battle: "Watch the battle"
+    watch_battle: "觀看戰役"
     tournament_started: "，錦標賽已開始"
     tournament_ends: "錦標賽結束"
     tournament_ended: "錦標賽已結束"
@@ -1214,8 +1227,7 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     recently_played: "最近玩過"
     no_recent_games: "在過去兩個星期沒有玩過遊戲。"
     payments: "付款"
-    prepaid: "充值"
-#    prepaid_codes: "Prepaid Codes"
+    prepaid_codes: "充值碼"
     purchased: "已購買"
     sale: "促銷"
     subscription: "訂閱"
@@ -1248,11 +1260,22 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
 
   account_prepaid:
     purchase_code: "購買訂閱碼"
-    purchase_amount: "數量"
+#    purchase_code1: "Subscription Codes can be redeemed to add premium subscription time to one or more CodeCombat accounts."
+#    purchase_code2: "Each CodeCombat account can only redeem a particular Subscription Code once."
+#    purchase_code3: "Subscription Code months will be added to the end of any existing subscription on the account."
+#    users: "Users"
+#    months: "Months"
     purchase_total: "總共"
     purchase_button: "提交購買"
-    your_codes: "你的訂閱碼："
+    your_codes: "你的訂閱碼：" # {change}
     redeem_codes: "兌換訂閱碼"
+#    prepaid_code: "Prepaid Code"
+#    lookup_code: "Lookup prepaid code"
+#    apply_account: "Apply to your account"
+#    copy_link: "You can copy the code's link and send it to someone."
+#    quantity: "Quantity"
+#    redeemed: "Redeemed"
+#    no_codes: "No codes yet!"
 
   loading_error:
     could_not_load: "從伺服器載入失敗"
@@ -1353,9 +1376,6 @@ module.exports = nativeDescription: "繁體中文", englishDescription: "Chinese
     text_diff: "文本變化"
     merge_conflict_with: "合併衝突出現在"
     no_changes: "沒有改變"
-
-#  temp:
-#    ace_of_coders_tournament: "New: play in the Ace of Coders tournament now!"
 
   multiplayer:
     multiplayer_title: "多人遊戲設定" # We'll be changing this around significantly soon. Until then, it's not important to translate.

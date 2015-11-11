@@ -80,14 +80,13 @@ setupPassportMiddleware = (app) ->
 
 setupCountryRedirectMiddleware = (app, country="china", countryCode="CN", languageCode="zh", serverID="tokyo") ->
   shouldRedirectToCountryServer = (req) ->
-    firstLanguage = req.acceptedLanguages[0]
-    speaksLanguage = firstLanguage and firstLanguage.indexOf(languageCode) isnt -1
+    speaksLanguage = _.any req.acceptedLanguages, (language) -> language.indexOf languageCode isnt -1
     unless config[serverID]
       ip = req.headers['x-forwarded-for'] or req.connection.remoteAddress
       ip = ip?.split(/,? /)[0]  # If there are two IP addresses, say because of CloudFlare, we just take the first.
       geo = geoip.lookup(ip)
       #if speaksLanguage or geo?.country is countryCode
-      #  log.info("Should we redirect to #{serverID} server? speaksLanguage: #{speaksLanguage}, firstLanguage: #{firstLanguage}, ip: #{ip}, geo: #{geo} -- so redirecting? #{geo?.country is 'CN' and speaksLanguage}")
+      #  log.info("Should we redirect to #{serverID} server? speaksLanguage: #{speaksLanguage}, acceptedLanguages: #{req.acceptedLanguages}, ip: #{ip}, geo: #{geo} -- so redirecting? #{geo?.country is 'CN' and speaksLanguage}")
       return geo?.country is countryCode and speaksLanguage
     else
       #log.info("We are on #{serverID} server. speaksLanguage: #{speaksLanguage}, acceptedLanguages: #{req.acceptedLanguages[0]}")
@@ -128,11 +127,6 @@ setupRedirectMiddleware = (app) ->
     nameOrID = req.path.split('/')[3]
     res.redirect 301, "/user/#{nameOrID}/profile"
 
-setupTrailingSlashRemovingMiddleware = (app) ->
-  app.use (req, res, next) ->
-    # Remove trailing slashes except for in /file/.../ URLs, because those are treated as directory listings.
-    return res.redirect 301, req.url[...-1] if req.url.length > 1 and req.url.slice(-1) is '/' and not /\/file\//.test req.url
-    next()
 
 exports.setupMiddleware = (app) ->
   setupCountryRedirectMiddleware app, "china", "CN", "zh", "tokyo"
@@ -141,7 +135,6 @@ exports.setupMiddleware = (app) ->
   setupExpressMiddleware app
   setupPassportMiddleware app
   setupOneSecondDelayMiddleware app
-  setupTrailingSlashRemovingMiddleware app
   setupRedirectMiddleware app
   setupErrorMiddleware app
   setupJavascript404s app

@@ -33,7 +33,7 @@ module.exports = class CocoRouter extends Backbone.Router
     'admin/clas': go('admin/CLAsView')
     'admin/employers': go('admin/EmployersListView')
     'admin/files': go('admin/FilesView')
-    'admin/analytics/users': go('admin/AnalyticsUsersView')
+    'admin/analytics': go('admin/AnalyticsView')
     'admin/analytics/subscriptions': go('admin/AnalyticsSubscriptionsView')
     'admin/level-sessions': go('admin/LevelSessionsView')
     'admin/users': go('admin/UsersView')
@@ -45,6 +45,7 @@ module.exports = class CocoRouter extends Backbone.Router
     'beta': go('HomeView')
 
     'careers': => window.location.href = 'https://jobs.lever.co/codecombat'
+    'Careers': => window.location.href = 'https://jobs.lever.co/codecombat'
 
     'cla': go('CLAView')
 
@@ -65,8 +66,9 @@ module.exports = class CocoRouter extends Backbone.Router
     'courses/mock1/enroll/:courseID': go('courses/mock1/CourseEnrollView')
     'courses/mock1/:courseID': go('courses/mock1/CourseDetailsView')
     'courses': go('courses/CoursesView')
-    'courses/students': go('courses/CoursesView')
-    'courses/teachers': go('courses/CoursesView')
+    'courses/students': go('courses/StudentCoursesView')
+    'courses/teachers': go('courses/TeacherCoursesView')
+    'courses/purchase': go('courses/PurchaseCoursesView')
     'courses/enroll(/:courseID)': go('courses/CourseEnrollView')
     'courses/:courseID(/:courseInstanceID)': go('courses/CourseDetailsView')
 
@@ -96,7 +98,7 @@ module.exports = class CocoRouter extends Backbone.Router
 
     'github/*path': 'routeToServer'
 
-    'hoc': go('courses/CoursesView')
+    'hoc': go('courses/HourOfCodeView')
 
     'i18n': go('i18n/I18NHomeView')
     'i18n/thang/:handle': go('i18n/I18NEditThangTypeView')
@@ -112,7 +114,7 @@ module.exports = class CocoRouter extends Backbone.Router
 
     'multiplayer': go('MultiplayerView')
 
-    'play': go('play/CampaignView')
+    'play(/)': go('play/CampaignView') # extra slash is to get Facebook app to work
     'play/ladder/:levelID/:leagueType/:leagueID': go('ladder/LadderView')
     'play/ladder/:levelID': go('ladder/LadderView')
     'play/ladder': go('ladder/MainLadderView')
@@ -131,10 +133,14 @@ module.exports = class CocoRouter extends Backbone.Router
     #'user/:slugOrID/profile': go('user/JobProfileView')
     'user/:slugOrID/profile': go('EmployersView')  # Show the not-recruiting-now screen
 
+    '*name/': 'removeTrailingSlash'
     '*name': go('NotFoundView')
 
   routeToServer: (e) ->
     window.location.href = window.location.href
+
+  removeTrailingSlash: (e) ->
+    @navigate e, {trigger: true}
 
   routeDirectly: (path, args) ->
     path = "views/#{path}" if not _.string.startsWith(path, 'views/')

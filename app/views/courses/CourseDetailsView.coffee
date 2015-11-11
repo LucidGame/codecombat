@@ -2,6 +2,7 @@ Campaign = require 'models/Campaign'
 CocoCollection = require 'collections/CocoCollection'
 Course = require 'models/Course'
 CourseInstance = require 'models/CourseInstance'
+Classroom = require 'models/Classroom'
 LevelSession = require 'models/LevelSession'
 RootView = require 'views/core/RootView'
 template = require 'templates/courses/course-details'
@@ -25,12 +26,12 @@ module.exports = class CourseDetailsView extends RootView
     'click .progress-level-cell': 'onClickProgressLevelCell'
     'mouseenter .progress-level-cell': 'onMouseEnterPoint'
     'mouseleave .progress-level-cell': 'onMouseLeavePoint'
-    'click #invite-btn': 'onClickInviteButton'
 
   constructor: (options, @courseID, @courseInstanceID) ->
     super options
     @courseID ?= options.courseID
     @courseInstanceID ?= options.courseInstanceID
+    @classroom = new Classroom()
     @adminMode = me.isAdmin()
     @memberSort = 'nameAsc'
     @course = @supermodel.getModel(Course, @courseID) or new Course _id: @courseID
@@ -66,7 +67,7 @@ module.exports = class CourseDetailsView extends RootView
 
   onCourseSync: ->
     # console.log 'onCourseSync'
-    if me.isAnonymous() and not me.get('hourOfCode')
+    if me.isAnonymous() and (not me.get('hourOfCode') and not @course.get('hourOfCode'))
       @noCourseInstance = true
       @render?()
       return
@@ -119,13 +120,25 @@ module.exports = class CourseDetailsView extends RootView
 
   onCourseInstanceSync: ->
     # console.log 'onCourseInstanceSync'
+    if @courseInstance.get('classroomID')
+      @classroom = new Classroom({_id: @courseInstance.get('classroomID')})
+      @supermodel.loadModel @classroom, 'classroom'
     @adminMode = true if @courseInstance.get('ownerID') is me.id and @courseInstance.get('name') isnt 'Single Player'
     @levelSessions = new CocoCollection([], { url: "/db/course_instance/#{@courseInstance.id}/level_sessions", model: LevelSession, comparator:'_id' })
     @listenToOnce @levelSessions, 'sync', @onLevelSessionsSync
     @supermodel.loadCollection @levelSessions, 'level_sessions', cache: false
     @members = new CocoCollection([], { url: "/db/course_instance/#{@courseInstance.id}/members", model: User, comparator: 'nameLower' })
     @listenToOnce @members, 'sync', @onMembersSync
+    me.set({
+      currentCourse: {
+        courseInstanceID: @courseInstance.id,
+        courseID: @course.id
+      }
+    })
+    me.patch()
     @supermodel.loadCollection @members, 'members', cache: false
+    @owner = new User({_id: @courseInstance.get('ownerID')})
+    @supermodel.loadModel @owner, 'user'
     if @adminMode and prepaidID = @courseInstance.get('prepaidID')
       @prepaid = @supermodel.getModel(Prepaid, prepaidID) or new Prepaid _id: prepaidID
       @listenTo @prepaid, 'sync', @onPrepaidSync
@@ -226,6 +239,9 @@ module.exports = class CourseDetailsView extends RootView
     description = $('.settings-description-input').val()
     console.log 'onClickSaveSettings', description
     @courseInstance.set('description', description)
+    @courseInstance.set('aceConfig', {
+      language: @$('#programming-language-select').val()
+    })
     @courseInstance.patch()
     $('#settingsModal').modal('hide')
 
@@ -248,26 +264,6 @@ module.exports = class CourseDetailsView extends RootView
       viewClass: 'views/play/level/PlayLevelView'
       viewArgs: [{}, levelSlug]
     }
-
-  onClickInviteButton: (e) ->
-    emails = @$('#invite-emails-textarea').val()
-    emails = emails.split('\n')
-    emails = _.filter((_.string.trim(email) for email in emails))
-    if not emails.length
-      return
-    url = @courseInstance.url() + '/invite_students'
-    @$('#invite-btn, #invite-emails-textarea').addClass('hide')
-    @$('#invite-emails-sending-alert').removeClass('hide')
-
-    $.ajax({
-      url: url
-      data: {emails: emails}
-      method: 'POST'
-      context: @
-      success: ->
-        @$('#invite-emails-sending-alert').addClass('hide')
-        @$('#invite-emails-success-alert').removeClass('hide')
-    })
 
   onMouseEnterPoint: (e) ->
     $('.progress-popup-container').hide()
@@ -313,3 +309,10 @@ module.exports = class CourseDetailsView extends RootView
           aName = @memberUserMap[a]?.get('name') ? 'Anoner'
           bName = @memberUserMap[b]?.get('name') ? 'Anoner'
           aName.localeCompare(bName)
+
+  getOwnerName: ->
+    if @owner.isNew()
+      return '?'
+    if @owner.get('firstName') and @owner.get('lastName')
+      return "#{@owner.get('firstName')} #{@owner.get('lastName')}"
+    return @owner.get('name') or @owner.get('email') or '?'

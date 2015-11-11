@@ -4,8 +4,6 @@ Article = require 'models/Article'
 SubscribeModal = require 'views/core/SubscribeModal'
 utils = require 'core/utils'
 
-# let's implement this once we have the docs database schema set up
-
 module.exports = class LevelGuideView extends CocoView
   template: template
   id: 'guide-view'
@@ -41,10 +39,10 @@ module.exports = class LevelGuideView extends CocoView
     @docs = specific.concat(general)
     @docs = $.extend(true, [], @docs)
     @docs = [@docs[0]] if @firstOnly and @docs[0]
-    doc.html = marked(utils.i18n doc, 'body') for doc in @docs
+    doc.html = marked(utils.filterMarkdownCodeLanguages(utils.i18n(doc, 'body'))) for doc in @docs
     doc.name = (utils.i18n doc, 'name') for doc in @docs
     doc.slug = _.string.slugify(doc.name) for doc in @docs
-    super()
+    super options
 
   destroy: ->
     if @vimeoListenerAttached
@@ -52,6 +50,7 @@ module.exports = class LevelGuideView extends CocoView
         window.removeEventListener('message', @onMessageReceived, false)
       else
         window.detachEvent('onmessage', @onMessageReceived, false)
+    oldEditor.destroy() for oldEditor in @aceEditors ? []
     super()
 
   getRenderData: ->
@@ -70,7 +69,17 @@ module.exports = class LevelGuideView extends CocoView
       @$el.find('.nav-tabs li:first').addClass('active')
       @$el.find('.tab-content .tab-pane:first').addClass('active')
       @$el.find('.nav-tabs a').click(@clickTab)
+    @configureACEEditors()
     @playSound 'guide-open'
+
+  configureACEEditors: ->
+    oldEditor.destroy() for oldEditor in @aceEditors ? []
+    @aceEditors = []
+    aceEditors = @aceEditors
+    codeLanguage = me.get('aceConfig')?.language or 'python'
+    @$el.find('pre').each ->
+      aceEditor = utils.initializeACE @, codeLanguage
+      aceEditors.push aceEditor
 
   clickSubscribe: (e) ->
     level = @levelSlug # Save ref to level slug
@@ -121,7 +130,7 @@ module.exports = class LevelGuideView extends CocoView
     tag.src = helpVideoURL + "?api=1&badge=0&byline=0&portrait=0&title=0"
     tag.height = @helpVideoHeight
     tag.width = @helpVideoWidth
-    tag.frameborder = '0'
+    tag.allowFullscreen = true
     @$el.find('#help-video-player').replaceWith(tag)
 
     @onMessageReceived = (e) =>
