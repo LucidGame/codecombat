@@ -33,7 +33,7 @@ class LevelSessionsCollection extends CocoCollection
     @url = "/db/user/#{me.id}/level.sessions?project=state.complete,levelID,state.difficulty,playtime"
 
 class CampaignsCollection extends CocoCollection
-  url: '/db/campaign'
+  url: '/db/campaign/-/overworld'
   model: Campaign
   project: ['name', 'fullName', 'description', 'i18n']
 
@@ -70,7 +70,7 @@ module.exports = class CampaignView extends RootView
     @sessions = @supermodel.loadCollection(new LevelSessionsCollection(), 'your_sessions', {cache: false}, 0).model
     @listenToOnce @sessions, 'sync', @onSessionsLoaded
     unless @terrain
-      @campaigns = @supermodel.loadCollection(new CampaignsCollection(), 'campaigns', null, 0).model
+      @campaigns = @supermodel.loadCollection(new CampaignsCollection(), 'campaigns', null, 1).model
       @listenToOnce @campaigns, 'sync', @onCampaignsLoaded
       return
 
@@ -126,6 +126,15 @@ module.exports = class CampaignView extends RootView
     @particleMan?.destroy()
     clearInterval @portalScrollInterval
     super()
+
+  showLoading: ($el) ->
+    unless @campaign
+      @$el.find('.game-controls, .user-status').addClass 'hidden'
+      @$el.find('.portal .campaign-name span').text $.i18n.t 'common.loading'
+
+  hideLoading: ->
+    unless @campaign
+      @$el.find('.game-controls, .user-status').removeClass 'hidden'
 
   getLevelPlayCounts: ->
     return unless me.isAdmin()
@@ -418,7 +427,8 @@ module.exports = class CampaignView extends RootView
   onSessionsLoaded: (e) ->
     return if @editorMode
     for session in @sessions.models
-      @levelStatusMap[session.get('levelID')] = if session.get('state')?.complete then 'complete' else 'started'
+      unless @levelStatusMap[session.get('levelID')] is 'complete'  # Don't overwrite a complete session with an incomplete one
+        @levelStatusMap[session.get('levelID')] = if session.get('state')?.complete then 'complete' else 'started'
       @levelDifficultyMap[session.get('levelID')] = session.get('state').difficulty if session.get('state')?.difficulty
     @render()
     @loadUserPollsRecord() unless me.get 'anonymous'

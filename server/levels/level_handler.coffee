@@ -11,6 +11,7 @@ log = require 'winston'
 Campaign = require '../campaigns/Campaign'
 Course = require  '../courses/Course'
 CourseInstance = require '../courses/CourseInstance'
+Classroom = require '../classrooms/Classroom'
 
 LevelHandler = class LevelHandler extends Handler
   modelClass: Level
@@ -108,7 +109,7 @@ LevelHandler = class LevelHandler extends Handler
       Session.findOne(sessionQuery).exec (err, doc) =>
         return @sendDatabaseError(res, err) if err
         return @sendSuccess(res, doc) if doc?
-        if level.get('type') is 'course'
+        if level.get('type') is 'course' or req.query.course?
           return @makeOrRejectCourseLevelSession(req, res, level, sessionQuery)
         requiresSubscription = level.get('requiresSubscription') or (req.user.isOnPremiumServer() and level.get('campaign') and not (level.slug in ['dungeons-of-kithgard', 'gems-in-the-deep', 'shadow-guard', 'forgetful-gemsmith', 'signs-and-portents', 'true-names']))
         canPlayAnyway = req.user.isPremium() or level.get 'adventurer'
@@ -129,10 +130,16 @@ LevelHandler = class LevelHandler extends Handler
             courses = _.filter(courses, (course) -> course.get('campaignID').toString() in campaignStrings)
             courseStrings = (course.id.toString() for course in courses)
             courseInstances = _.filter(courseInstances, (courseInstance) -> courseInstance.get('courseID').toString() in courseStrings)
-            aceConfigs = (ci.get('aceConfig') for ci in courseInstances)
-            aceConfig = _.filter(aceConfigs)[0] or {}
-            req.codeLanguage = aceConfig.language
-            @createAndSaveNewSession(sessionQuery, req, res)
+            classroomIDs = (courseInstance.get('classroomID') for courseInstance in courseInstances)
+            classroomIDs = _.filter _.uniq classroomIDs, false, (objectID='') -> objectID.toString()
+            if classroomIDs.length
+              Classroom.find({ _id: { $in: classroomIDs }}).exec (err, classrooms) =>
+                aceConfigs = (c.get('aceConfig') for c in classrooms)
+                aceConfig = _.filter(aceConfigs)[0] or {}
+                req.codeLanguage = aceConfig.language
+                @createAndSaveNewSession(sessionQuery, req, res)
+            else
+              @createAndSaveNewSession(sessionQuery, req, res)
           else
             return @sendPaymentRequiredError(res, 'You must be in a course which includes this level to play it')
 

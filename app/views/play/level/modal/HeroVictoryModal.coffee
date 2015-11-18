@@ -48,7 +48,7 @@ module.exports = class HeroVictoryModal extends ModalView
     @session = options.session
     @level = options.level
     @thangTypes = {}
-    if @level.get('type', true) is 'hero'
+    if @level.get('type', true) in ['hero', 'hero-ladder', 'course', 'course-ladder']
       achievements = new CocoCollection([], {
         url: "/db/achievement?related=#{@session.get('level').original}"
         model: Achievement
@@ -212,7 +212,7 @@ module.exports = class HeroVictoryModal extends ModalView
 
   afterRender: ->
     super()
-    @$el.toggleClass 'with-achievements', @level.get('type', true) is 'hero'
+    @$el.toggleClass 'with-achievements', @level.get('type', true) in ['hero', 'hero-ladder']
     return unless @supermodel.finished()
     @playSelectionSound hero, true for original, hero of @thangTypes  # Preload them
     @updateSavingProgressStatus()
@@ -222,8 +222,8 @@ module.exports = class HeroVictoryModal extends ModalView
       @insertSubView @ladderSubmissionView, @$el.find('.ladder-submission-view')
 
   initializeAnimations: ->
-    if @level.get('type', true) is 'hero'
-      @updateXPBars 0
+    return @endSequentialAnimations() unless @level.get('type', true) in ['hero', 'hero-ladder']
+    @updateXPBars 0
     #playVictorySound = => @playSound 'victory-title-appear'  # TODO: actually add this
     @$el.find('#victory-header').delay(250).queue(->
       $(@).removeClass('out').dequeue()
@@ -253,7 +253,7 @@ module.exports = class HeroVictoryModal extends ModalView
 
   beginSequentialAnimations: ->
     return if @destroyed
-    return unless @level.get('type', true) is 'hero'
+    return unless @level.get('type', true) in ['hero', 'hero-ladder']
     @sequentialAnimatedPanels = _.map(@animatedPanels.find('.reward-panel'), (panel) -> {
       number: $(panel).data('number')
       previousNumber: $(panel).data('previous-number')
@@ -406,12 +406,14 @@ module.exports = class HeroVictoryModal extends ModalView
       # need to do something more complicated to load its slug
       console.log 'have @nextLevel', @nextLevel, 'from nextLevel', nextLevel
       link = "/play/level/#{@nextLevel.get('slug')}"
+      if @courseID
+        link += "?course=#{@courseID}"
+        link += "&course-instance=#{@courseInstanceID}" if @courseInstanceID
     else if @level.get('type', true) is 'course'
       link = "/courses"
       if @courseID
         link += "/#{@courseID}"
-        if @courseInstanceID
-          link += "/#{@courseInstanceID}"
+        link += "/#{@courseInstanceID}" if @courseInstanceID
     else
       link = '/play'
       nextCampaign = @getNextLevelCampaign()
@@ -428,10 +430,8 @@ module.exports = class HeroVictoryModal extends ModalView
     _.merge options, extraOptions if extraOptions
     if @level.get('type', true) is 'course' and @nextLevel and not options.returnToCourse
       viewClass = require 'views/play/level/PlayLevelView'
-      if @courseID
-        options.courseID = @courseID
-      if @courseInstanceID
-        options.courseInstanceID = @courseInstanceID
+      options.courseID = @courseID
+      options.courseInstanceID = @courseInstanceID
       viewArgs = [options, @nextLevel.get('slug')]
     else if @level.get('type', true) is 'course'
       # TODO: shouldn't set viewClass and route in different places
@@ -440,8 +440,7 @@ module.exports = class HeroVictoryModal extends ModalView
       if @courseID
         viewClass = require 'views/courses/CourseDetailsView'
         viewArgs.push @courseID
-        if @courseInstanceID
-          viewArgs.push @courseInstanceID
+        viewArgs.push @courseInstanceID if @courseInstanceID
     else
       viewClass = require 'views/play/CampaignView'
       viewArgs = [options, @getNextLevelCampaign()]
