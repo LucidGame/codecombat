@@ -150,7 +150,7 @@ module.exports = class LadderTabView extends CocoView
 
   refreshLadder: ->
     @supermodel.resetProgress()
-    @ladderLimit ?= parseInt @getQueryVariable('top_players', 20)
+    @ladderLimit ?= parseInt @getQueryVariable('top_players', if @options.league then 100 else 20)
     for team in @teams
       if oldLeaderboard = @leaderboards[team.id]
         @supermodel.removeModelResource oldLeaderboard
@@ -280,7 +280,10 @@ module.exports = class LadderTabView extends CocoView
   consolidateFriends: ->
     allFriendSessions = (@facebookFriendSessions or []).concat(@gplusFriendSessions or [])
     sessions = _.uniq allFriendSessions, false, (session) -> session._id
-    sessions = _.sortBy sessions, 'totalScore'
+    if @options.league
+      sessions = _.sortBy sessions, (session) -> _.find(session.leagues, leagueID: @options.league.id)?.stats.totalScore ? (session.totalScore / 2)
+    else
+      sessions = _.sortBy sessions, 'totalScore'
     sessions.reverse()
     sessions
 
