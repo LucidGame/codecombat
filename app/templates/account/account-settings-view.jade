@@ -26,6 +26,15 @@ else
               .form-group.checkbox
                 label(for="godmode", data-i18n="account_settings.god_mode") God Mode
                 input#godmode(name="godmode", type="checkbox", checked=godmode)
+            if me.hasSubscription()
+              .form-group
+                label(data-i18n="account.subscription")
+                br
+                span.spr ✓
+                span(data-i18n="account.active")
+                span.spr= '.'
+                // TODO: show better summary states, like active, subscribed, free, and active until.
+                a(href="/account/subscription", data-i18n="account_settings.manage_subscription")
                 
     
       .panel.panel-default
@@ -150,7 +159,7 @@ else
                   | (Translator)
               input#email_diplomatNews(name="email_diplomatNews", type="checkbox", checked=subs.diplomatNews)
               span(data-i18n="contribute.diplomat_subscribe_desc").help-block Get emails about i18n developments and, eventually, levels to translate.
-      
+
             .form-group.checkbox
               label.control-label(for="email_ambassadorNews")
                 span(data-i18n="classes.ambassador_title")
@@ -160,7 +169,13 @@ else
                   | (Support)
               input#email_ambassadorNews(name="email_ambassadorNews", type="checkbox", checked=subs.ambassadorNews)
               span(data-i18n="contribute.ambassador_subscribe_desc").help-block Get emails on support updates and multiplayer developments.
-                  
+
+            .form-group.checkbox
+              label.control-label(for="email_teacherNews")
+                span(data-i18n="classes.teacher_title")
+              input#email_teacherNews(name="email_teacherNews", type="checkbox", checked=subs.teacherNews)
+              span(data-i18n="contribute.teacher_subscribe_desc").help-block
+
             button#toggle-all-btn.btn.btn-primary.form-control(data-i18n="account_settings.email_toggle") Toggle All
 
       .panel.panel-default

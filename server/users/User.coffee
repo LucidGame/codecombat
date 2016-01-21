@@ -30,6 +30,8 @@ UserSchema.index({'simulatedBy': 1})
 UserSchema.index({'slug': 1}, {name: 'slug index', sparse: true, unique: true})
 UserSchema.index({'stripe.subscriptionID': 1}, {unique: true, sparse: true})
 UserSchema.index({'siteref': 1}, {name: 'siteref index', sparse: true})
+UserSchema.index({'schoolName': 1}, {name: 'schoolName index', sparse: true})
+UserSchema.index({'country': 1}, {name: 'country index', sparse: true})
 
 UserSchema.post('init', ->
   @set('anonymous', false) if @get('email')
@@ -74,6 +76,7 @@ emailNameMap =
   diplomatNews: 'translator'
   ambassadorNews: 'support'
   anyNotes: 'notification'
+  teacherNews: 'teacher'
 
 UserSchema.methods.setEmailSubscription = (newName, enabled) ->
   oldSubs = _.clone @get('emailSubscriptions')
@@ -148,7 +151,7 @@ UserSchema.statics.updateServiceSettings = (doc, callback) ->
     doc.updatedMailChimp = true
     callback?()
 
-  mc?.lists.subscribe params, onSuccess, onFailure unless config.unittest
+  mc?.lists.subscribe params, onSuccess, onFailure
 
 UserSchema.statics.statsMapping =
   edits:
@@ -311,7 +314,8 @@ UserSchema.statics.hashPassword = (password) ->
 UserSchema.statics.privateProperties = [
   'permissions', 'email', 'mailChimp', 'firstName', 'lastName', 'gender', 'facebookID',
   'gplusID', 'music', 'volume', 'aceConfig', 'employerAt', 'signedEmployerAgreement',
-  'emailSubscriptions', 'emails', 'activity', 'stripe', 'stripeCustomerID', 'chinaVersion', 'country'
+  'emailSubscriptions', 'emails', 'activity', 'stripe', 'stripeCustomerID', 'chinaVersion', 'country',
+  'schoolName', 'ageRange'
 ]
 UserSchema.statics.jsonSchema = jsonschema
 UserSchema.statics.editableProperties = [
@@ -319,7 +323,7 @@ UserSchema.statics.editableProperties = [
   'firstName', 'lastName', 'gender', 'ageRange', 'facebookID', 'gplusID', 'emails',
   'testGroupNumber', 'music', 'hourOfCode', 'hourOfCodeComplete', 'preferredLanguage',
   'wizard', 'aceConfig', 'autocastDelay', 'lastLevel', 'jobProfile', 'savedEmployerFilterAlerts',
-  'heroConfig', 'iosIdentifierForVendor', 'siteref', 'referrer'
+  'heroConfig', 'iosIdentifierForVendor', 'siteref', 'referrer', 'schoolName'
 ]
 
 UserSchema.plugin plugins.NamedPlugin
