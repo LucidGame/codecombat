@@ -3,12 +3,14 @@ module.exports.thangNames = thangNames =
     # Female
     'Alali'
     'Anabel'
+    'Delma'
     'Dosha'
     'Gurzunn'
     'Hoot'
     'Inski'
     'Iyert'
     'Lacos'
+    'Merna'
     'Palt'
     'Paulark'
     'Pripp'
@@ -21,6 +23,7 @@ module.exports.thangNames = thangNames =
     # Male
     'Blob'
     'Brack'
+    'Cragg'
     'Dobo'
     'Draff'
     'Eugen'
@@ -71,6 +74,7 @@ module.exports.thangNames = thangNames =
     'Pinakin'
     'Rakash'
     'Rasha'
+    'Savatha'
     'Vujii'
     'Wuda'
     'Yetu'
@@ -107,6 +111,8 @@ module.exports.thangNames = thangNames =
   ]
   'Ogre Warlock': [
     # Male
+    'Gronak'
+    'Sorgoth'
     'Vax'
     'Vyrryx'
     'Vyjj'
@@ -143,37 +149,14 @@ module.exports.thangNames = thangNames =
     'Ofgar'
     'Randall'
   ]
-  'Raven': [
-    # Animal
-    'Baltimore'
-    'Columbia'
-    'Dawnstar'
-    'Nevermore'
-  ]
-  'Cougar': [
-    # Animal
-    'Guenhwyvar'
-    'Kitty'
-    'Shasta'
-    'Simbia'
-  ]
-  'Frog': [
-    # Animal
-    'Bighead'
-    'Bufo'
-    'Bunda'
-    'Dan\'l Webster'
-    'Freddy'
-    'Frogger'
-    'Froggy'
-    'Hypnotoad'
-    'Mr. Toad'
-    'Slippy'
-    'Toada'
-    'Trevor'
-    'Wart'
-    'Wei Qi'
-  ]
+  # Pets only have one name
+  'Raven Pet': ['Nevermore']
+  'Cougar Pet': ['Kitty']
+  'Frog Pet': ['Hypnotoad']
+  'Griffin Pet': ['']
+  'Pugicorn Pet': ['']
+  'Polar Bear Pet': ['']
+  'Wolf Pet': ['']
   'Horse': [
     # Animal
     'Abby'
@@ -409,7 +392,7 @@ module.exports.thangNames = thangNames =
     'Nalfar'
     'Drezhul'
   ]
-  'Dark Wizard': [
+  'Master Wizard': [
     # Female
     'Lilith'
     'Usara'
@@ -490,6 +473,7 @@ module.exports.thangNames = thangNames =
     # Male
     'Azgot'
     'Brom'
+    'Blemmin'
     'Carlton'
     'Charles'
     'Durfkor'
@@ -609,6 +593,7 @@ module.exports.thangNames = thangNames =
     'Hugo'
     'Ieyasu'
     'Jack'
+    'Jackson'
     'James'
     'Jason'
     'Jax'
@@ -984,4 +969,12 @@ module.exports.thangNames = thangNames =
     'Nobunaga'
     'Yasuo'
     'Yi'
+  ]
+  'Champion': [
+    # Female
+    'Ida'
+  ]
+  'Duelist': [
+    # Male
+    'Alejandro'
   ]

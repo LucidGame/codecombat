@@ -2,7 +2,10 @@ require '../common'
 utils = require '../utils'
 _ = require 'lodash'
 Promise = require 'bluebird'
+request = require '../request'
 requestAsync = Promise.promisify(request, {multiArgs: true})
+Article = require '../../../server/models/Article'
+User = require '../../../server/models/User'
 
 describe 'GET /db/article', ->
   articleData1 = { name: 'Article 1', body: 'Article 1 body cow', i18nCoverage: [] }
@@ -14,7 +17,7 @@ describe 'GET /db/article', ->
     yield utils.loginUser(@admin)
     yield request.postAsync(getURL('/db/article'), { json: articleData1 })
     yield request.postAsync(getURL('/db/article'), { json: articleData2 })
-    yield utils.logout()
+    yield utils.becomeAnonymous()
     done()
       
       
@@ -191,7 +194,7 @@ describe 'POST /db/article', ->
     
   it 'does not allow anonymous users to create Articles', utils.wrap (done) ->
     yield utils.clearModels([Article])
-    yield utils.logout()
+    yield utils.becomeAnonymous()
     [res, body] = yield request.postAsync({uri: getURL('/db/article'), json: articleData })
     expect(res.statusCode).toBe(401)
     done()
@@ -448,7 +451,7 @@ describe 'POST /db/article/:handle/new-version', ->
 
 
   it 'does not work for anonymous users', utils.wrap (done) ->
-    yield utils.logout()
+    yield utils.becomeAnonymous()
     yield postNewVersion({ name: 'Article name', body: 'New body' }, 401)
     articles = yield Article.find()
     expect(articles.length).toBe(1)
@@ -468,11 +471,11 @@ describe 'POST /db/article/:handle/new-version', ->
     yield postNewVersion({ name: 'Article name', body: 'New body', commitMessage: 'Commit message' })
     
     
-  it 'sends a notification to artisan and main HipChat channels', utils.wrap (done) ->
-    hipchat = require '../../../server/hipchat'
-    spyOn(hipchat, 'sendHipChatMessage')
+  it 'sends a notification to artisan and main Slack channels', utils.wrap (done) ->
+    slack = require '../../../server/slack'
+    spyOn(slack, 'sendSlackMessage')
     yield postNewVersion({ name: 'Article name', body: 'New body' })
-    expect(hipchat.sendHipChatMessage).toHaveBeenCalled()
+    expect(slack.sendSlackMessage).toHaveBeenCalled()
     done()
   
 describe 'version fetching endpoints', ->
@@ -577,7 +580,7 @@ describe 'GET and POST /db/article/:handle/names', ->
     yield utils.loginUser(admin)
     [res, article1] = yield request.postAsync(getURL('/db/article'), { json: articleData1 })
     [res, article2] = yield request.postAsync(getURL('/db/article'), { json: articleData2 })
-    yield utils.logout()
+    yield utils.becomeAnonymous()
     [res, body] = yield request.getAsync { uri: getURL('/db/article/names?ids='+[article1._id, article2._id].join(',')), json: true }
     expect(body.length).toBe(2)
     expect(body[0].name).toBe('Article 1')

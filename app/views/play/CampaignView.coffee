@@ -20,7 +20,6 @@ ShareProgressModal = require 'views/play/modal/ShareProgressModal'
 UserPollsRecord = require 'models/UserPollsRecord'
 Poll = require 'models/Poll'
 PollModal = require 'views/play/modal/PollModal'
-storage = require 'core/storage'
 CourseInstance = require 'models/CourseInstance'
 
 trackedHourOfCode = false
@@ -81,7 +80,6 @@ module.exports = class CampaignView extends RootView
         return
 
     @campaign = new Campaign({_id:@terrain})
-    @campaign.saveBackups = @editorMode
     @campaign = @supermodel.loadModel(@campaign).model
 
     # Temporary attempt to make sure all earned rewards are accounted for. Figure out a better solution...
@@ -266,6 +264,12 @@ module.exports = class CampaignView extends RootView
     authModal.mode = 'signup'
     @openModalView authModal
 
+  showAds: ->
+    return false # No ads for now.
+    if application.isProduction() && !me.isPremium() && !me.isTeacher() && !window.serverConfig.picoCTF
+      return me.getCampaignAdsGroup() is 'leaderboard-ads'
+    false
+
   annotateLevel: (level) ->
     level.position ?= { x: 10, y: 10 }
     level.locked = not me.ownsLevel level.original
@@ -401,7 +405,7 @@ module.exports = class CampaignView extends RootView
       particleKey.push 'hero' if level.unlocksHero and not level.unlockedHero
       #particleKey.push 'item' if level.slug is 'robot-ragnarok'  # TODO: generalize
       continue if particleKey.length is 2  # Don't show basic levels
-      continue unless level.hidden or _.intersection(particleKey, ['item', 'hero-ladder', 'replayable']).length
+      continue unless level.hidden or _.intersection(particleKey, ['item', 'hero-ladder', 'replayable', 'game-dev']).length
       @particleMan.addEmitter level.position.x / 100, level.position.y / 100, particleKey.join('-')
 
   onMouseEnterPortals: (e) ->
@@ -554,6 +558,7 @@ module.exports = class CampaignView extends RootView
     aspectRatio = mapWidth / mapHeight
     pageWidth = @$el.width()
     pageHeight = @$el.height()
+    pageHeight -= adContainerHeight if adContainerHeight = $('.ad-container').outerHeight()
     widthRatio = pageWidth / mapWidth
     heightRatio = pageHeight / mapHeight
     # Make sure we can see the whole map, fading to background in one dimension.

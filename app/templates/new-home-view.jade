@@ -1,36 +1,68 @@
 extends /templates/base-flat
 
+mixin box
+  .well.text-center
+    if me.isAnonymous() == true
+      h6#classroom-edition-header(data-i18n="new_home.classroom_edition")
+      div
+        a.teacher-btn.btn.btn-primary.btn-lg.btn-block(data-event-action="Homepage Click Teacher Button CTA", data-i18n="new_home.im_a_teacher")
+      div
+        a.student-btn.btn.btn-forest.btn-lg.btn-block(href="/courses", data-event-action="Homepage Click Student Button CTA", data-i18n="new_home.im_a_student")
+      h6#learn-to-code-header(data-i18n="new_home.learn_to_code")
+      a.btn.btn-gold.btn-lg.btn-block.play-btn(href=view.playURL, data-event-action="Homepage Play Now CTA", data-i18n="new_home.play_now")
+
+    else
+      h6#classroom-edition-header(data-i18n="new_home.logged_in_as")
+      p.small #{me.get("email")}
+      if me.isTeacher()
+        div
+          button.teacher-btn.btn.btn-forest.btn-lg.btn-block(data-event-action="Homepage Click My Classes CTA", data-i18n="new_home.goto_classes")
+        div
+          if view.isTeacherWithDemo
+            h6(data-i18n="new_home.check_out_wiki")
+            button.wiki-btn.btn.btn-primary.btn-lg.btn-block(data-event-action="Homepage Click Educator Wiki CTA", data-i18n="nav.educator_wiki")
+          else
+            h6(data-i18n="new_home.want_coco")
+            button.btn.btn-primary.btn-lg.request-demo(data-event-action="Homepage Request Demo CTA", data-i18n="new_home.request_demo")
+
+      else if me.justPlaysCourses()
+        div
+          a.btn.btn-forest.btn-lg.btn-block.play-btn(href=view.playURL, data-event-action="Homepage Classroom Continue Playing CTA", data-i18n="courses.continue_playing")
+        div
+          a.btn.btn-primary.btn-lg.btn-block.play-btn(href=view.playURL, data-event-action="Homepage View Progress CTA", data-i18n="new_home.view_progress")
+      else
+        div
+          a.btn.btn-forest.btn-lg.btn-block.play-btn(href=view.playURL, data-event-action="Homepage Campaign Continue Playing CTA", data-i18n="courses.continue_playing")
+        div
+          a.btn.btn-primary.btn-lg.btn-block.profile-btn(href=view.playURL, data-event-action="Homepage View Profile CTA", data-i18n="new_home.view_profile")
+
+
+      p.small
+        span(data-i18n="courses.not_you")
+        span &nbsp;
+        a.logout-btn(data-i18n="login.log_out", href="#")
+
+  if (me.get('preferredLanguage', true) || 'en-US').split('-')[0] == 'nl'
+    .well#ideal-tickets-well.text-center.hidden-xs.hidden-sm
+      h6 Thuis versie:
+      a.btn.btn-purple.btn-lg.btn-block(href="http://codecombat.nl/kopen") Prepaid codes (iDeal)
+
+
 block content
-  .container-fluid#jumbotron-container-fluid(class=view.jumbotron === 'student' ? 'alt-image' : '')
+  .container-fluid#jumbotron-container-fluid.alt-image
     .container
-      .row
+      .row.hidden-xs.top-spacer(style="height: 160px")
+      .row.hidden-sm.hidden-xs
         .col-lg-7.col-md-8
           h1(data-i18n="new_home.slogan")
-
         .col-lg-3.col-lg-offset-2.col-md-4
-          .well.text-center.hidden-md.hidden-lg
-            .row
-              .col-xs-8
-                h6(data-i18n="new_home.classroom_edition")
-              .col-xs-4
-                h6(data-i18n="new_home.learn_to_code")
-            .row
-              .col-xs-4
-                button#teacher-btn.btn.btn-primary.btn-lg.btn-block(data-i18n="new_home.teacher")
-              .col-xs-4
-                a.btn.btn-forest.btn-lg.btn-block(href="/courses", data-i18n="new_home.student")
-              .col-xs-4
-                a.btn.btn-gold.btn-lg.btn-block(href=view.playURL, data-i18n="new_home.play_now")
-
-          .well.text-center.hidden-xs.hidden-sm
-            h6#classroom-edition-header(data-i18n="new_home.classroom_edition")
-            div
-              button#teacher-btn.btn.btn-primary.btn-lg.btn-block(data-i18n="new_home.im_a_teacher")
-            div
-              a.btn.btn-forest.btn-lg.btn-block(href="/courses", data-i18n="new_home.im_a_student")
-
-            h6#learn-to-code-header(data-i18n="new_home.learn_to_code")
-            a.btn.btn-gold.btn-lg.btn-block(href=view.playURL, data-i18n="new_home.play_now")
+          +box
+      .row.hidden-lg.hidden-md
+        .col-lg-7.col-md-8
+          h1(data-i18n="new_home.slogan")
+        .col
+          div(style="margin: auto; max-width: 300px")
+            +box
       .row#learn-more-row
         .col-xs-12.text-center
           a#learn-more-link
@@ -159,7 +191,7 @@ block content
           span(data-i18n="new_home.agency")
 
     .request-demo-row.text-center
-      if me.isTeacher()
+      if view.isTeacherWithDemo
         h3(data-i18n="new_home.get_started_title")
       else
         h3(data-i18n="new_home.request_demo_title")
@@ -167,7 +199,7 @@ block content
       .teacher-screenshots
         .screenshots
           .hidden-sm.hidden-md.hidden-lg
-            small(data-i18n="new_home.teacher_screenshots_hint")
+            small(data-i18n="new_home.top_screenshots_hint")
           .screenshot-grid(title='Click to view full size')
             a.screen-thumbnail(data-toggle="modal", data-target="#screenshot-lightbox", data-index='1')
               img(src="/images/pages/about/forest.png")
@@ -176,20 +208,20 @@ block content
             a.screen-thumbnail(data-toggle="modal", data-target="#screenshot-lightbox", data-index='3')
               img(src="/images/pages/about/glacier.png")
           .clearfix.hidden-xs
-            small(data-i18n="new_home.teacher_screenshots_hint")
+            small(data-i18n="new_home.top_screenshots_hint")
 
-      if me.isTeacher()
+      if view.isTeacherWithDemo
         h4(data-i18n="new_home.get_started_subtitle")
         div
-          a.btn.btn-primary.btn-lg(href="/courses/teachers", data-i18n="new_home.setup_a_class")
+          button.btn.btn-primary.btn-lg.setup-class-btn(data-event-action="Homepage Setup Class", data-i18n="new_home.setup_a_class")
       else
         h4(data-i18n="new_home.request_demo_subtitle")
         div
-          a.btn.btn-primary.btn-lg(href="/teachers/demo", data-i18n="new_home.request_demo")
+          button.btn.btn-primary.btn-lg.request-demo(data-event-action="Homepage Request Demo", data-i18n="new_home.request_demo")
         if me.isAnonymous()
           .have-an-account
             span.spr(data-i18n="new_home.have_an_account")
-            a.login-button(data-i18n="new_home.log_in")
+            a.login-button(data-i18n="login.log_in")
 
     h3.text-center(data-i18n="new_home.computer_science")
     h4.text-center
@@ -272,16 +304,16 @@ block content
 
     .request-demo-row.text-center
       h3(data-i18n="new_home.run_class")
-      if me.isTeacher()
+      if view.isTeacherWithDemo
         div
-          a.btn.btn-primary.btn-lg(href="/courses/teachers", data-i18n="new_home.setup_a_class")
+          button.btn.btn-primary.btn-lg.setup-class-btn(data-event-action="Homepage Setup Class Page Bottom", data-i18n="new_home.setup_a_class")
       else
         div
-          a.btn.btn-primary.btn-lg(href="/teachers/demo", data-i18n="new_home.request_demo")
+          button.btn.btn-primary.btn-lg.request-demo(data-event-action="Homepage Request Demo Page Bottom", data-i18n="new_home.request_demo")
         if me.isAnonymous()
           .have-an-account
             span.spr(data-i18n="new_home.have_an_account")
-            a.login-button(data-i18n="new_home.log_in")
+            a.login-button(data-i18n="login.log_in")
 
 
     #screenshot-lightbox.modal.fade(data-show="false")

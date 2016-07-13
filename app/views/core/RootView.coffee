@@ -99,11 +99,6 @@ module.exports = class RootView extends CocoView
     #location.hash = hash
     @renderScrollbar()
 
-  getRenderData: ->
-    c = super()
-    c.usesSocialMedia = @usesSocialMedia
-    c
-
   afterRender: ->
     if @$el.find('#site-nav').length # hack...
       @$el.addClass('site-chrome')
@@ -115,10 +110,8 @@ module.exports = class RootView extends CocoView
     @buildLanguages()
     $('body').removeClass('is-playing')
 
-    if application.isProduction()
-      title = 'CodeCombat - ' + (@getTitle() or 'Learn how to code by playing a game')
-    else
-      title = @getTitle() or @constructor.name
+    if title = @getTitle() then title += ' | CodeCombat'
+    else title = 'CodeCombat - Learn how to code by playing a game' 
 
     $('title').text(title)
 

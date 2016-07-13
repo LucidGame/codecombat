@@ -1,5 +1,5 @@
 RootView = require 'views/core/RootView'
-template = require 'templates/play/level'
+template = require 'templates/play/play-level-view'
 {me} = require 'core/auth'
 ThangType = require 'models/ThangType'
 utils = require 'core/utils'
@@ -20,6 +20,7 @@ Article = require 'models/Article'
 Camera = require 'lib/surface/Camera'
 AudioPlayer = require 'lib/AudioPlayer'
 Simulator = require 'lib/simulator/Simulator'
+GameUIState = require 'models/GameUIState'
 
 # subviews
 LevelLoadingView = require './LevelLoadingView'
@@ -41,6 +42,8 @@ PicoCTFVictoryModal = require './modal/PicoCTFVictoryModal'
 InfiniteLoopModal = require './modal/InfiniteLoopModal'
 LevelSetupManager = require 'lib/LevelSetupManager'
 ContactModal = require 'views/core/ContactModal'
+HintsView = require './HintsView'
+HintsState = require './HintsState'
 
 PROFILE_ME = false
 
@@ -66,7 +69,6 @@ module.exports = class PlayLevelView extends RootView
     'god:infinite-loop': 'onInfiniteLoop'
     'level:reload-from-data': 'onLevelReloadFromData'
     'level:reload-thang-type': 'onLevelReloadThangType'
-    'level:session-will-save': 'onSessionWillSave'
     'level:started': 'onLevelStarted'
     'level:loading-view-unveiling': 'onLoadingViewUnveiling'
     'level:loading-view-unveiled': 'onLoadingViewUnveiled'
@@ -106,9 +108,9 @@ module.exports = class PlayLevelView extends RootView
 
     @opponentSessionID = @getQueryVariable('opponent')
     @opponentSessionID ?= @options.opponent
+    @gameUIState = new GameUIState()
 
     $(window).on 'resize', @onWindowResize
-    @saveScreenshot = _.throttle @saveScreenshot, 30000
 
     application.tracker?.enableInspectletJS(@levelID)
 
@@ -135,9 +137,13 @@ module.exports = class PlayLevelView extends RootView
 
   load: ->
     @loadStartTime = new Date()
-    @god = new God debugWorker: true
-    @levelLoader = new LevelLoader supermodel: @supermodel, levelID: @levelID, sessionID: @sessionID, opponentSessionID: @opponentSessionID, team: @getQueryVariable('team'), observing: @observing, courseID: @courseID
+    @god = new God({@gameUIState})
+    levelLoaderOptions = supermodel: @supermodel, levelID: @levelID, sessionID: @sessionID, opponentSessionID: @opponentSessionID, team: @getQueryVariable('team'), observing: @observing, courseID: @courseID
+    if me.isSessionless()
+      levelLoaderOptions.fakeSessionConfig = {}
+    @levelLoader = new LevelLoader levelLoaderOptions
     @listenToOnce @levelLoader, 'world-necessities-loaded', @onWorldNecessitiesLoaded
+    @listenTo @levelLoader, 'world-necessity-load-failed', @onWorldNecessityLoadFailed
 
   trackLevelLoadEnd: ->
     return if @isEditorPreview
@@ -147,6 +153,14 @@ module.exports = class PlayLevelView extends RootView
     unless @observing
       application.tracker?.trackEvent 'Finished Level Load', category: 'Play Level', label: @levelID, level: @levelID, loadDuration: @loadDuration
       application.tracker?.trackTiming @loadDuration, 'Level Load Time', @levelID, @levelID
+
+  isCourseMode: -> @courseID and @courseInstanceID
+
+  showAds: ->
+    return false # No ads for now.
+    if application.isProduction() && !me.isPremium() && !me.isTeacher() && !window.serverConfig.picoCTF && !@isCourseMode()
+      return me.getCampaignAdsGroup() is 'leaderboard-ads'
+    false
 
   # CocoView overridden methods ###############################################
 
@@ -184,11 +198,14 @@ module.exports = class PlayLevelView extends RootView
     @controlBar.setBus(@bus)
     @initScriptManager()
 
+  onWorldNecessityLoadFailed: (resource) ->
+    @loadingView.onLoadError(resource)
+
   grabLevelLoaderData: ->
     @session = @levelLoader.session
     @world = @levelLoader.world
     @level = @levelLoader.level
-    @$el.addClass 'hero' if @level.get('type', true) in ['hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder']
+    @$el.addClass 'hero' if @level.get('type', true) in ['hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder', 'game-dev']
     @$el.addClass 'flags' if _.any(@world.thangs, (t) -> (t.programmableProperties and 'findFlags' in t.programmableProperties) or t.inventory?.flag) or @level.get('slug') is 'sky-span'
     # TODO: Update terminology to always be opponentSession or otherSession
     # TODO: E.g. if it's always opponent right now, then variable names should be opponentSession until we have coop play
@@ -214,7 +231,7 @@ module.exports = class PlayLevelView extends RootView
       opponentSpells = opponentSpells.concat spells
     if (not @session.get('teamSpells')) and @otherSession?.get('teamSpells')
       @session.set('teamSpells', @otherSession.get('teamSpells'))
-    opponentCode = @otherSession?.get('transpiledCode') or {}
+    opponentCode = @otherSession?.get('code') or {}
     myCode = @session.get('code') or {}
     for spell in opponentSpells
       [thang, spell] = spell.split '/'
@@ -244,9 +261,10 @@ module.exports = class PlayLevelView extends RootView
     @god.setGoalManager @goalManager
 
   insertSubviews: ->
-    @insertSubView @tome = new TomeView levelID: @levelID, session: @session, otherSession: @otherSession, thangs: @world.thangs, supermodel: @supermodel, level: @level, observing: @observing, courseID: @courseID, courseInstanceID: @courseInstanceID, god: @god
+    @hintsState = new HintsState({ hidden: true }, { @session, @level })
+    @insertSubView @tome = new TomeView { @levelID, @session, @otherSession, thangs: @world.thangs, @supermodel, @level, @observing, @courseID, @courseInstanceID, @god, @hintsState }
     @insertSubView new LevelPlaybackView session: @session, level: @level
-    @insertSubView new GoalsView {}
+    @insertSubView new GoalsView {level: @level}
     @insertSubView new LevelFlagsView levelID: @levelID, world: @world if @$el.hasClass 'flags'
     @insertSubView new GoldView {} unless @level.get('slug') in ['wakka-maul']
     @insertSubView new HUDView {level: @level}
@@ -255,6 +273,7 @@ module.exports = class PlayLevelView extends RootView
     @insertSubView new ProblemAlertView session: @session, level: @level, supermodel: @supermodel
     @insertSubView new DuelStatsView level: @level, session: @session, otherSession: @otherSession, supermodel: @supermodel, thangs: @world.thangs if @level.get('type') in ['hero-ladder', 'course-ladder']
     @insertSubView @controlBar = new ControlBarView {worldName: utils.i18n(@level.attributes, 'name'), session: @session, level: @level, supermodel: @supermodel, courseID: @courseID, courseInstanceID: @courseInstanceID}
+    @insertSubView @hintsView = new HintsView({ @session, @level, @hintsState }), @$('.hints-view')
     #_.delay (=> Backbone.Mediator.publish('level:set-debug', debug: true)), 5000 if @isIPadApp()   # if me.displayName() is 'Nick'
 
   initVolume: ->
@@ -326,7 +345,15 @@ module.exports = class PlayLevelView extends RootView
   initSurface: ->
     webGLSurface = $('canvas#webgl-surface', @$el)
     normalSurface = $('canvas#normal-surface', @$el)
-    @surface = new Surface(@world, normalSurface, webGLSurface, thangTypes: @supermodel.getModels(ThangType), observing: @observing, playerNames: @findPlayerNames(), levelType: @level.get('type', true))
+    surfaceOptions = {
+      thangTypes: @supermodel.getModels(ThangType)
+      @observing
+      playerNames: @findPlayerNames()
+      levelType: @level.get('type', true)
+      stayVisible: @showAds()
+      @gameUIState
+    }
+    @surface = new Surface(@world, normalSurface, webGLSurface, surfaceOptions)
     worldBounds = @world.getBounds()
     bounds = [{x: worldBounds.left, y: worldBounds.top}, {x: worldBounds.right, y: worldBounds.bottom}]
     @surface.camera.setBounds(bounds)
@@ -336,7 +363,7 @@ module.exports = class PlayLevelView extends RootView
     return {} unless @level.get('type') in ['ladder', 'hero-ladder', 'course-ladder']
     playerNames = {}
     for session in [@session, @otherSession] when session?.get('team')
-      playerNames[session.get('team')] = session.get('creatorName') or 'Anoner'
+      playerNames[session.get('team')] = session.get('creatorName') or 'Anonymous'
     playerNames
 
   # Once Surface is Loaded ####################################################
@@ -400,16 +427,14 @@ module.exports = class PlayLevelView extends RootView
 
   perhapsStartSimulating: ->
     return unless @shouldSimulate()
+    return console.error "Should not auto-simulate until we fix how these languages are loaded"
     # TODO: how can we not require these as part of /play bundle?
-    #require "vendor/aether-#{codeLanguage}" for codeLanguage in ['javascript', 'python', 'coffeescript', 'lua', 'clojure', 'io']
-    require 'vendor/aether-javascript'
-    require 'vendor/aether-python'
-    require 'vendor/aether-coffeescript'
-    require 'vendor/aether-lua'
-    require 'vendor/aether-java'
-    require 'vendor/aether-clojure'
-    require 'vendor/aether-io'
-    require 'vendor/aether-java'
+    ##require "vendor/aether-#{codeLanguage}" for codeLanguage in ['javascript', 'python', 'coffeescript', 'lua', 'java']
+    #require 'vendor/aether-javascript'
+    #require 'vendor/aether-python'
+    #require 'vendor/aether-coffeescript'
+    #require 'vendor/aether-lua'
+    #require 'vendor/aether-java'
     @simulateNextGame()
 
   simulateNextGame: ->
@@ -444,7 +469,7 @@ module.exports = class PlayLevelView extends RootView
     return false if $.browser?.msie or $.browser?.msedge
     return false if $.browser.linux
     return false if me.level() < 8
-    if levelType is 'course'
+    if levelType in ['course', 'game-dev']
       return false
     else if levelType is 'hero' and gamesSimulated
       return false if stillBuggy
@@ -499,7 +524,8 @@ module.exports = class PlayLevelView extends RootView
         break
     Backbone.Mediator.publish 'tome:cast-spell', {}
 
-  onWindowResize: (e) => @endHighlight()
+  onWindowResize: (e) =>
+    @endHighlight()
 
   onDisableControls: (e) ->
     return if e.controls and not ('level' in e.controls)
@@ -516,7 +542,7 @@ module.exports = class PlayLevelView extends RootView
   onDonePressed: -> @showVictory()
 
   onShowVictory: (e) ->
-    $('#level-done-button').show() unless @level.get('type', true) in ['hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder']
+    $('#level-done-button').show() unless @level.get('type', true) in ['hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder', 'game-dev']
     @showVictory() if e.showModal
     return if @victorySeen
     @victorySeen = true
@@ -534,8 +560,8 @@ module.exports = class PlayLevelView extends RootView
     return if @level.hasLocalChanges()  # Don't award achievements when beating level changed in level editor
     @endHighlight()
     options = {level: @level, supermodel: @supermodel, session: @session, hasReceivedMemoryWarning: @hasReceivedMemoryWarning, courseID: @courseID, courseInstanceID: @courseInstanceID, world: @world}
-    ModalClass = if @level.get('type', true) in ['hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder'] then HeroVictoryModal else VictoryModal
-    ModalClass = CourseVictoryModal if @courseID and @courseInstanceID
+    ModalClass = if @level.get('type', true) in ['hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder', 'game-dev'] then HeroVictoryModal else VictoryModal
+    ModalClass = CourseVictoryModal if @isCourseMode() or me.isSessionless()
     ModalClass = PicoCTFVictoryModal if window.serverConfig.picoCTF
     victoryModal = new ModalClass(options)
     @openModalView(victoryModal)
@@ -566,16 +592,8 @@ module.exports = class PlayLevelView extends RootView
       @bus.removeFirebaseData =>
         @bus.disconnect()
 
-  onSessionWillSave: (e) ->
-    # Something interesting has happened, so (at a lower frequency), we'll save a screenshot.
-    #@saveScreenshot e.session
-
-  # Throttled
-  saveScreenshot: (session) =>
-    return unless screenshot = @surface?.screenshot()
-    session.save {screenshot: screenshot}, {patch: true, type: 'PUT'}
-
   onContactClicked: (e) ->
+    Backbone.Mediator.publish 'level:contact-button-pressed', {}
     @openModalView contactModal = new ContactModal levelID: @level.get('slug') or @level.id, courseID: @courseID, courseInstanceID: @courseInstanceID
     screenshot = @surface.screenshot(1, 'image/png', 1.0, 1)
     body =
@@ -624,7 +642,7 @@ module.exports = class PlayLevelView extends RootView
     return unless @$el.hasClass 'real-time'
     @$el.removeClass 'real-time'
     @onWindowResize()
-    if @world.frames.length is @world.totalFrames
+    if @world.frames.length is @world.totalFrames and not @surface.countdownScreen?.showing
       _.delay @onSubmissionComplete, 750  # Wait for transition to end.
     else
       @waitingForSubmissionComplete = true
@@ -632,6 +650,7 @@ module.exports = class PlayLevelView extends RootView
 
   onSubmissionComplete: =>
     return if @destroyed
+    Backbone.Mediator.publish 'level:set-time', ratio: 1
     return if @level.hasLocalChanges()  # Don't award achievements when beating level changed in level editor
     # TODO: Show a victory dialog specific to hero-ladder level
     if @goalManager.checkOverallStatus() is 'success' and not @options.realTimeMultiplayerSessionID?
@@ -924,20 +943,6 @@ module.exports = class PlayLevelView extends RootView
         console.error 'Failed to read sessionState in onRealTimeMultiplayerCast'
 
     console.info 'Submitting my code'
-    # Transpiling code copied from scripts/transpile.coffee
-    # TODO: Should this live somewhere else?
-    transpiledCode = {}
-    for thang, spells of @session.get('code')
-      transpiledCode[thang] = {}
-      for spellID, spell of spells
-        spellName = thang + '/' + spellID
-        continue if @session.get('teamSpells') and not (spellName in @session.get('teamSpells')[@session.get('team')])
-        # console.log "PlayLevelView Transpiling spell #{spellName}"
-        aetherOptions = createAetherOptions functionName: spellID, codeLanguage: @session.get('submittedCodeLanguage'), includeFlow: true
-        aether = new Aether aetherOptions
-        transpiledCode[thang][spellID] = aether.transpile spell
-    # console.log "PlayLevelView transpiled code", transpiledCode
-    @session.set 'transpiledCode', transpiledCode
     permissions = @session.get 'permissions' ? []
     unless _.find(permissions, (p) -> p.target is 'public' and p.access is 'read')
       permissions.push target:'public', access:'read'

@@ -14,6 +14,7 @@ doNothing = ->
 
 module.exports = class CocoView extends Backbone.View
   cache: false # signals to the router to keep this view around
+  retainSubviews: false # set to true if you don't want subviews to be destroyed whenever the view renders
   template: -> ''
 
   events:
@@ -108,11 +109,18 @@ module.exports = class CocoView extends Backbone.View
 
   render: ->
     return @ unless me
-    view.destroy() for id, view of @subviews
+    if @retainSubviews
+      oldSubviews = _.values(@subviews)
+    else
+      view.destroy() for id, view of @subviews
     @subviews = {}
     super()
     return @template if _.isString(@template)
     @$el.html @template(@getRenderData())
+
+    if @retainSubviews
+      for view in oldSubviews
+        @insertSubView(view)
 
     if not @supermodel.finished()
       @showLoading()
@@ -137,6 +145,7 @@ module.exports = class CocoView extends Backbone.View
     context._ = _
     context.document = document
     context.i18n = utils.i18n
+    context.state = @state
     context
 
   afterRender: ->
@@ -305,11 +314,20 @@ module.exports = class CocoView extends Backbone.View
     key = @makeSubViewKey(view)
     @subviews[key].destroy() if key of @subviews
     elToReplace ?= @$el.find('#'+view.id)
-    elToReplace.after(view.el).remove()
-    @registerSubView(view, key)
-    view.render()
-    view.afterInsert()
-    view
+    if @retainSubviews
+      @registerSubView(view, key)
+      if elToReplace[0]
+        view.setElement(elToReplace[0])
+        view.render()
+        view.afterInsert()
+      return view
+
+    else
+      elToReplace.after(view.el).remove()
+      @registerSubView(view, key)
+      view.render()
+      view.afterInsert()
+      return view
 
   registerSubView: (view, key) ->
     # used to register views which are custom inserted into the view,
@@ -390,7 +408,7 @@ module.exports = class CocoView extends Backbone.View
     setTimeout (=> $pointer.css transition: 'all 0.4s ease-in', transform: "rotate(#{@pointerRotation}rad) translate(-3px, #{@pointerRadialDistance}px)"), 800
 
   endHighlight: ->
-    @getPointer(false).css({'opacity': 0.0, 'transition': 'none', top: '-50px', right: '-50px'}) 
+    @getPointer(false).css({'opacity': 0.0, 'transition': 'none', top: '-50px', right: '-50px'})
     clearInterval @pointerInterval
     clearTimeout @pointerDelayTimeout
     clearTimeout @pointerDurationTimeout
@@ -444,6 +462,9 @@ module.exports = class CocoView extends Backbone.View
   scrollToLink: (link, speed=300) ->
     scrollTo = $(link).offset().top
     $('html, body').animate({ scrollTop: scrollTo }, speed)
+    
+  scrollToTop: (speed=300) ->
+    $('html, body').animate({ scrollTop: 0 }, speed)
 
   toggleFullscreen: (e) ->
     # https://developer.mozilla.org/en-US/docs/Web/Guide/API/DOM/Using_full_screen_mode?redirectlocale=en-US&redirectslug=Web/Guide/DOM/Using_full_screen_mode

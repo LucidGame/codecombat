@@ -45,6 +45,7 @@ _.extend CampaignSchema.properties, {
       showIfUnlocked: { type: 'string', links: [{rel: 'db', href: '/db/level/{($)}/version'}], format: 'latest-version-original-reference' }
     }
   }}
+  levelsUpdated: c.date()
 
   levels: { type: 'object', format: 'levels', additionalProperties: {
     title: 'Level'
@@ -60,11 +61,12 @@ _.extend CampaignSchema.properties, {
       i18n: { type: 'object', format: 'hidden' }
       requiresSubscription: { type: 'boolean' }
       replayable: { type: 'boolean' }
-      type: {'enum': ['ladder', 'ladder-tutorial', 'hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder']}
+      type: {'enum': ['ladder', 'ladder-tutorial', 'hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder', 'game-dev']}
       slug: { type: 'string', format: 'hidden' }
       original: { type: 'string', format: 'hidden' }
       adventurer: { type: 'boolean' }
       practice: { type: 'boolean' }
+      practiceThresholdMinutes: {type: 'number'}
       adminOnly: { type: 'boolean' }
       disableSpaces: { type: ['boolean','number'] }
       hidesSubmitUntilRun: { type: 'boolean' }

@@ -88,6 +88,14 @@ errorResponseSchema = {
       type: 'string'
       description: 'Property which is related to the error (conflict, validation).'
     }
+    name: {
+      type: 'string'
+      description: 'Provided for /auth/name.' # TODO: refactor out
+    }
+    errorID: {
+      type: 'string'
+      description: 'Error id to be used by the client to handle specific errors'
+    }
   }
 }
 errorProps = _.keys(errorResponseSchema.properties)
@@ -107,6 +115,10 @@ module.exports.NetworkError = NetworkError
 module.exports.Unauthorized = class Unauthorized extends NetworkError
   code: 401
   errorName: 'Unauthorized'
+  
+module.exports.PaymentRequired = class PaymentRequired extends NetworkError
+  code: 402
+  errorName: 'PaymentRequired'
 
 module.exports.Forbidden = class Forbidden extends NetworkError
   code: 403

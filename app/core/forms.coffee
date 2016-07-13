@@ -21,7 +21,7 @@ module.exports.formToObject = ($el, options) ->
   obj
   
 module.exports.objectToForm = ($el, obj, options={}) ->
-  options = _.extend({ overwriteExisting: false })
+  options = _.extend({ overwriteExisting: false }, options)
   inputs = $('input, textarea, select', $el)
   for input in inputs
     input = $(input)
@@ -57,6 +57,14 @@ module.exports.applyErrorsToForm = (el, errors, warning=false) ->
       message = error.message if error.formatted
       prop = error.property
 
+    if error.code is tv4.errorCodes.FORMAT_CUSTOM
+      originalMessage = /Format validation failed \(([^\(\)]+)\)/.exec(message)[1]
+      unless _.isEmpty(originalMessage)
+        message = originalMessage
+    
+    if error.code is 409 and error.property is 'email'
+      message += ' <a class="login-link">Log in?</a>'
+
     missingErrors.push error unless setErrorToProperty el, prop, message, warning
   missingErrors
 
@@ -84,7 +92,8 @@ module.exports.setErrorToProperty = setErrorToProperty = (el, property, message,
   
 module.exports.scrollToFirstError = ($el=$('body')) ->
   $first = $el.find('.has-error, .alert-danger, .error-help-block, .has-warning, .alert-warning, .warning-help-block').filter(':visible').first()
-  $('html, body').animate({ scrollTop: $first.offset().top - 20 }, 300)
+  if $first.length
+    $('html, body').animate({ scrollTop: $first.offset().top - 20 }, 300)
 
 module.exports.clearFormAlerts = (el) ->
   $('.has-error', el).removeClass('has-error')
