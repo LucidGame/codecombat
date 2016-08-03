@@ -80,7 +80,7 @@ var myImportScripts = importScripts;
 var languagesImported = {};
 var ensureLanguageImported = function(language) {
   if (languagesImported[language]) return;
-  if (language === 'javascript') return;  // Only has JSHint, but we don't need to lint here.
+  if (language === 'javascript' || language === 'html') return;  // Only has JSHint, but we don't need to lint here.
   myImportScripts("/javascripts/app/vendor/aether-" + language + ".js");
   languagesImported[language] = true;
 };
@@ -389,6 +389,8 @@ self.runWorld = function runWorld(args) {
     self.world.preloading = args.preload;
     self.world.headless = args.headless;
     self.world.realTime = args.realTime;
+    self.world.indefiniteLength = args.indefiniteLength;
+    self.world.justBegin = args.justBegin;
     self.goalManager = new GoalManager(self.world);
     self.goalManager.setGoals(args.goals);
     self.goalManager.setCode(args.userCodeMap);
@@ -434,6 +436,9 @@ self.onWorldLoaded = function onWorldLoaded() {
   var diff = t1 - self.t0;
   var goalStates = self.goalManager.getGoalStates();
   var totalFrames = self.world.totalFrames;
+  if(self.world.indefiniteLength) {
+    totalFrames = self.world.frames.length;
+  }
   if(self.world.ended) {
     var overallStatus = self.goalManager.checkOverallStatus();
     var lastFrameHash = self.world.frames[totalFrames - 2].hash

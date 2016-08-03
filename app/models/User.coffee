@@ -19,9 +19,9 @@ module.exports = class User extends CocoModel
   displayName: -> @get('name', true)
   broadName: ->
     return '(deleted)' if @get('deleted')
-    name = @get('name')
-    return name if name
     name = _.filter([@get('firstName'), @get('lastName')]).join(' ')
+    return name if name
+    name = @get('name')
     return name if name
     [emailName, emailDomain] = @get('email')?.split('@') or []
     return emailName if emailName
@@ -89,10 +89,9 @@ module.exports = class User extends CocoModel
   isSessionless: ->
     # TODO: Fix old users who got mis-tagged as teachers
     # TODO: Should this just be isTeacher, eventually?
-    Boolean(me.isTeacher() and utils.getQueryVariable('course', false))
+    Boolean((utils.getQueryVariable('dev', false) or me.isTeacher()) and utils.getQueryVariable('course', false))
 
   setRole: (role, force=false) ->
-    return if me.isAdmin()
     oldRole = @get 'role'
     return if oldRole is role or (oldRole and not force)
     @set 'role', role
@@ -271,32 +270,32 @@ module.exports = class User extends CocoModel
         window.location.reload()
     @fetch(options)
     
-  signupWithPassword: (email, password, options={}) ->
+  signupWithPassword: (name, email, password, options={}) ->
     options.url = _.result(@, 'url') + '/signup-with-password'
     options.type = 'POST'
     options.data ?= {}
-    _.extend(options.data, {email, password})
+    _.extend(options.data, {name, email, password})
     jqxhr = @fetch(options)
     jqxhr.then ->
       window.tracker?.trackEvent 'Finished Signup', category: "Signup", label: 'CodeCombat'
     return jqxhr
     
-  signupWithFacebook: (email, facebookID, options={}) ->
+  signupWithFacebook: (name, email, facebookID, options={}) ->
     options.url = _.result(@, 'url') + '/signup-with-facebook'
     options.type = 'POST'
     options.data ?= {}
-    _.extend(options.data, {email, facebookID, facebookAccessToken: application.facebookHandler.token()})
+    _.extend(options.data, {name, email, facebookID, facebookAccessToken: application.facebookHandler.token()})
     jqxhr = @fetch(options)
     jqxhr.then ->
       window.tracker?.trackEvent 'Facebook Login', category: "Signup", label: 'Facebook'
       window.tracker?.trackEvent 'Finished Signup', category: "Signup", label: 'Facebook'
     return jqxhr
 
-  signupWithGPlus: (email, gplusID, options={}) ->
+  signupWithGPlus: (name, email, gplusID, options={}) ->
     options.url = _.result(@, 'url') + '/signup-with-gplus'
     options.type = 'POST'
     options.data ?= {}
-    _.extend(options.data, {email, gplusID, gplusAccessToken: application.gplusHandler.token()})
+    _.extend(options.data, {name, email, gplusID, gplusAccessToken: application.gplusHandler.token()})
     jqxhr = @fetch(options)
     jqxhr.then ->
       window.tracker?.trackEvent 'Google Login', category: "Signup", label: 'GPlus'
@@ -352,6 +351,16 @@ module.exports = class User extends CocoModel
   remainTeacher: (options={}) ->
     options.url = '/db/user/-/remain-teacher'
     options.type = 'PUT'
+    @fetch(options)
+    
+  destudent: (options={}) ->
+    options.url = _.result(@, 'url') + '/destudent'
+    options.type = 'POST'
+    @fetch(options)
+
+  deteacher: (options={}) ->
+    options.url = _.result(@, 'url') + '/deteacher'
+    options.type = 'POST'
     @fetch(options)
 
 tiersByLevel = [-1, 0, 0.05, 0.14, 0.18, 0.32, 0.41, 0.5, 0.64, 0.82, 0.91, 1.04, 1.22, 1.35, 1.48, 1.65, 1.78, 1.96, 2.1, 2.24, 2.38, 2.55, 2.69, 2.86, 3.03, 3.16, 3.29, 3.42, 3.58, 3.74, 3.89, 4.04, 4.19, 4.32, 4.47, 4.64, 4.79, 4.96,

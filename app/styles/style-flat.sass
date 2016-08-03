@@ -90,6 +90,9 @@ body[lang='ru'], body[lang='uk'], body[lang='bg'], body[lang^='mk'], body[lang='
       top: 20px
       font-size: 40px
       opacity: 0.5
+      
+  hr
+    border-top: 1px solid gray
   
   // Navbar
 
@@ -116,6 +119,10 @@ body[lang='ru'], body[lang='uk'], body[lang='bg'], body[lang^='mk'], body[lang='
     .navbar-toggle
       color: black
       margin: 30px 25px 0
+      border-color: $navy
+
+      .icon-bar
+        background-color: $navy
       
     @media (min-width: $screen-lg-min)
       #navbar-collapse

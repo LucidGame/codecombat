@@ -71,6 +71,7 @@ module.exports.setup = (app) ->
   app.get('/db/classroom/:handle/members', mw.classrooms.fetchMembers) # TODO: Use mw.auth?
   app.post('/db/classroom/:classroomID/members/:memberID/reset-password', mw.classrooms.setStudentPassword)
   app.post('/db/classroom/:anything/members', mw.auth.checkLoggedIn(), mw.classrooms.join)
+  app.post('/db/classroom/:handle/update-courses', mw.classrooms.updateCourses)
   app.get('/db/classroom/:handle', mw.auth.checkLoggedIn()) # TODO: Finish migrating route, adding now so 401 is returned
   app.get('/db/classroom/-/users', mw.auth.checkHasPermission(['admin']), mw.classrooms.getUsers)
 
@@ -79,7 +80,7 @@ module.exports.setup = (app) ->
   app.get('/db/codelogs', mw.auth.checkHasPermission(['admin']), mw.rest.get(CodeLog))
 
   Course = require '../models/Course'
-  app.get('/db/course', mw.rest.get(Course))
+  app.get('/db/course', mw.courses.get(Course))
   app.get('/db/course/:handle', mw.rest.getByHandle(Course))
   app.get('/db/course/:handle/levels/:levelOriginal/next', mw.courses.fetchNextLevel)
 
@@ -88,7 +89,8 @@ module.exports.setup = (app) ->
   app.get('/db/course_instance/:handle/levels/:levelOriginal/sessions/:sessionID/next', mw.courseInstances.fetchNextLevel)
   app.post('/db/course_instance/:handle/members', mw.auth.checkLoggedIn(), mw.courseInstances.addMembers)
   app.get('/db/course_instance/:handle/classroom', mw.auth.checkLoggedIn(), mw.courseInstances.fetchClassroom)
-
+  app.get('/db/course_instance/:handle/course', mw.auth.checkLoggedIn(), mw.courseInstances.fetchCourse)
+  
   app.put('/db/user/:handle', mw.users.resetEmailVerifiedFlag)
   app.delete('/db/user/:handle', mw.users.removeFromClassrooms)
   app.get('/db/user', mw.users.fetchByGPlusID, mw.users.fetchByFacebookID)
@@ -102,8 +104,11 @@ module.exports.setup = (app) ->
   app.post('/db/user/:handle/signup-with-facebook', mw.users.signupWithFacebook)
   app.post('/db/user/:handle/signup-with-gplus', mw.users.signupWithGPlus)
   app.post('/db/user/:handle/signup-with-password', mw.users.signupWithPassword)
+  app.post('/db/user/:handle/destudent', mw.auth.checkHasPermission(['admin']), mw.users.destudent)
+  app.post('/db/user/:handle/deteacher', mw.auth.checkHasPermission(['admin']), mw.users.deteacher)
   
   app.get('/db/prepaid', mw.auth.checkLoggedIn(), mw.prepaids.fetchByCreator)
+  app.get('/db/prepaid/-/active-schools', mw.auth.checkHasPermission(['admin']), mw.prepaids.fetchActiveSchools)
   app.post('/db/prepaid', mw.auth.checkHasPermission(['admin']), mw.prepaids.post)
   app.post('/db/prepaid/:handle/redeemers', mw.prepaids.redeem)
 

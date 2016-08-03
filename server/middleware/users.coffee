@@ -8,9 +8,11 @@ Promise = require 'bluebird'
 parse = require '../commons/parse'
 request = require 'request'
 mongoose = require 'mongoose'
+database = require '../commons/database'
 sendwithus = require '../sendwithus'
 User = require '../models/User'
 Classroom = require '../models/Classroom'
+CourseInstance = require '../models/CourseInstance'
 facebook = require '../lib/facebook'
 gplus = require '../lib/gplus'
 TrialRequest = require '../models/TrialRequest'
@@ -89,6 +91,8 @@ module.exports =
     timestamp = (new Date).getTime()
     if not user
       throw new errors.NotFound('User not found')
+    if not user.get('email')
+      throw new errors.UnprocessableEntity('User must have an email address to receive a verification email')
     context =
       email_id: sendwithus.templates.verify_email
       recipient:
@@ -127,23 +131,30 @@ module.exports =
     unless req.user.isAnonymous()
       throw new errors.Forbidden('You are already signed in.')
 
-    { password, email } = req.body
-    unless _.all([password, email])
-      throw new errors.UnprocessableEntity('Requires password and email')
+    { name, email, password } = req.body
+    unless password
+      throw new errors.UnprocessableEntity('Requires password')
+    unless name or email
+      throw new errors.UnprocessableEntity('Requires username or email')
 
-    if yield User.findByEmail(email)
+    if not _.isEmpty(email) and yield User.findByEmail(email)
       throw new errors.Conflict('Email already taken')
+    if not _.isEmpty(name) and yield User.findByName(name)
+      throw new errors.Conflict('Name already taken')
 
-    req.user.set({ password, email, anonymous: false })
+    req.user.set({ name, email, password, anonymous: false })
     yield module.exports.finishSignup(req, res)
 
   signupWithFacebook: wrap (req, res) ->
     unless req.user.isAnonymous()
       throw new errors.Forbidden('You are already signed in.')
 
-    { facebookID, facebookAccessToken, email } = req.body
-    unless _.all([facebookID, facebookAccessToken, email])
-      throw new errors.UnprocessableEntity('Requires facebookID, facebookAccessToken and email')
+    { facebookID, facebookAccessToken, email, name } = req.body
+    unless _.all([facebookID, facebookAccessToken, email, name])
+      throw new errors.UnprocessableEntity('Requires facebookID, facebookAccessToken, email, and name')
+
+    if not _.isEmpty(name) and yield User.findByName(name)
+      throw new errors.Conflict('Name already taken')
 
     facebookResponse = yield facebook.fetchMe(facebookAccessToken)
     emailsMatch = email is facebookResponse.email
@@ -151,16 +162,19 @@ module.exports =
     unless emailsMatch and idsMatch
       throw new errors.UnprocessableEntity('Invalid facebookAccessToken')
 
-    req.user.set({ facebookID, email, anonymous: false })
+    req.user.set({ facebookID, email, name, anonymous: false })
     yield module.exports.finishSignup(req, res)
 
   signupWithGPlus: wrap (req, res) ->
     unless req.user.isAnonymous()
       throw new errors.Forbidden('You are already signed in.')
 
-    { gplusID, gplusAccessToken, email } = req.body
-    unless _.all([gplusID, gplusAccessToken, email])
-      throw new errors.UnprocessableEntity('Requires gplusID, gplusAccessToken and email')
+    { gplusID, gplusAccessToken, email, name } = req.body
+    unless _.all([gplusID, gplusAccessToken, email, name])
+      throw new errors.UnprocessableEntity('Requires gplusID, gplusAccessToken, email, and name')
+
+    if not _.isEmpty(name) and yield User.findByName(name)
+      throw new errors.Conflict('Name already taken')
 
     gplusResponse = yield gplus.fetchMe(gplusAccessToken)
     emailsMatch = email is gplusResponse.email
@@ -169,7 +183,7 @@ module.exports =
     unless emailsMatch and idsMatch
       throw new errors.UnprocessableEntity('Invalid gplusAccessToken')
 
-    req.user.set({ gplusID, email, anonymous: false })
+    req.user.set({ gplusID, email, name, anonymous: false })
     yield module.exports.finishSignup(req, res)
     
   finishSignup: co.wrap (req, res) ->
@@ -199,3 +213,44 @@ module.exports =
         yield trialRequest.update({$unset: {applicant: ''}})
         
     res.status(200).send(req.user.toObject({req: req}))
+    
+  destudent: wrap (req, res) ->
+    user = yield database.getDocFromHandle(req, User)
+    if not user
+      throw new errors.NotFound('User not found.')
+      
+    if not user.isStudent()
+      return res.status(200).send(user.toObject({req: req}))
+      
+    yield Classroom.update(
+      { members: user._id },
+      { $pull: {members: user._id} },
+      { multi: true }
+    )
+    
+    yield CourseInstance.update(
+      { members: user._id },
+      { $pull: {members: user._id} },
+      { multi: true }
+    )
+
+    yield user.update({ $unset: {role: ''}})
+    user.set('role', undefined)
+    return res.status(200).send(user.toObject({req: req}))
+
+
+  deteacher: wrap (req, res) ->
+    user = yield database.getDocFromHandle(req, User)
+    if not user
+      throw new errors.NotFound('User not found.')
+
+    if not user.isTeacher()
+      return res.status(200).send(user.toObject({req: req}))
+
+    yield TrialRequest.remove(
+      { applicant: user._id },
+    )
+
+    yield user.update({ $unset: {role: ''}})
+    user.set('role', undefined)
+    return res.status(200).send(user.toObject({req: req}))

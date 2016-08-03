@@ -3,6 +3,9 @@ utils = require '../utils'
 urlUser = '/db/user'
 User = require '../../../server/models/User'
 Classroom = require '../../../server/models/Classroom'
+CourseInstance = require '../../../server/models/CourseInstance'
+Course = require '../../../server/models/Course'
+Campaign = require '../../../server/models/Campaign'
 TrialRequest = require '../../../server/models/TrialRequest'
 Prepaid = require '../../../server/models/Prepaid'
 request = require '../request'
@@ -232,6 +235,14 @@ ghlfarghlarghlfarghlarghlfarghlarghlfarghlarghlfarghlarghlfarghlarghlfarghlarghl
     expect(body.role).toBe('advisor')
     [res, body] = yield request.putAsync { uri: url, json: { role: 'student' }}
     expect(body.role).toBe('advisor')
+    done()
+
+  it 'returns 422 if both email and name would be unset for a registered user', utils.wrap (done) ->
+    user = yield utils.initUser()
+    yield utils.loginUser(user)
+    [res, body] = yield request.putAsync { uri: getURL('/db/user/'+user.id), json: { email: '', name: '' }}
+    expect(body.code).toBe(422)
+    expect(body.message).toEqual('User needs a username or email address')
     done()
 
 describe 'PUT /db/user/-/become-student', ->
@@ -688,13 +699,58 @@ describe 'POST /db/user/:handle/signup-with-password', ->
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-password")
     email = 'some@email.com'
-    json = { email, password: '12345' }
+    name = 'someusername'
+    json = { name, email, password: '12345' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(200)
     updatedUser = yield User.findById(user.id)
     expect(updatedUser.get('email')).toBe(email)
     expect(updatedUser.get('passwordHash')).toBeDefined()
     expect(sendwithus.api.send).toHaveBeenCalled()
+    done()
+
+  it 'signs up the user with just a name and password', utils.wrap (done) ->
+    user = yield utils.becomeAnonymous()
+    url = getURL("/db/user/#{user.id}/signup-with-password")
+    name = 'someusername'
+    json = { name, password: '12345' }
+    [res, body] = yield request.postAsync({url, json})
+    expect(res.statusCode).toBe(200)
+    updatedUser = yield User.findById(user.id)
+    expect(updatedUser.get('name')).toBe(name)
+    expect(updatedUser.get('nameLower')).toBe(name.toLowerCase())
+    expect(updatedUser.get('slug')).toBe(name.toLowerCase())
+    expect(updatedUser.get('passwordHash')).toBeDefined()
+    expect(updatedUser.get('email')).toBeUndefined()
+    expect(updatedUser.get('emailLower')).toBeUndefined()
+    done()
+
+  it 'signs up the user with a username, email, and password', utils.wrap (done) ->
+    user = yield utils.becomeAnonymous()
+    url = getURL("/db/user/#{user.id}/signup-with-password")
+    name = 'someusername'
+    email = 'user@example.com'
+    json = { name, email, password: '12345' }
+    [res, body] = yield request.postAsync({url, json})
+    expect(res.statusCode).toBe(200)
+    updatedUser = yield User.findById(user.id)
+    expect(updatedUser.get('name')).toBe(name)
+    expect(updatedUser.get('nameLower')).toBe(name.toLowerCase())
+    expect(updatedUser.get('slug')).toBe(name.toLowerCase())
+    expect(updatedUser.get('email')).toBe(email)
+    expect(updatedUser.get('emailLower')).toBe(email.toLowerCase())
+    expect(updatedUser.get('passwordHash')).toBeDefined()
+    done()
+
+  it 'returns 422 if neither username or email were provided', utils.wrap (done) ->
+    user = yield utils.becomeAnonymous()
+    url = getURL("/db/user/#{user.id}/signup-with-password")
+    json = { password: '12345' }
+    [res, body] = yield request.postAsync({url, json})
+    expect(res.statusCode).toBe(422)
+    updatedUser = yield User.findById(user.id)
+    expect(updatedUser.get('anonymous')).toBe(true)
+    expect(updatedUser.get('passwordHash')).toBeUndefined()
     done()
 
   it 'returns 409 if there is already a user with the given email', utils.wrap (done) ->
@@ -704,6 +760,17 @@ describe 'POST /db/user/:handle/signup-with-password', ->
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-password")
     json = { email, password: '12345' }
+    [res, body] = yield request.postAsync({url, json})
+    expect(res.statusCode).toBe(409)
+    done()
+
+  it 'returns 409 if there is already a user with the given username', utils.wrap (done) ->
+    name = 'someusername'
+    initialUser = yield utils.initUser({name})
+    expect(initialUser.get('nameLower')).toBeDefined()
+    user = yield utils.becomeAnonymous()
+    url = getURL("/db/user/#{user.id}/signup-with-password")
+    json = { name, password: '12345' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(409)
     done()
@@ -738,8 +805,9 @@ describe 'POST /db/user/:handle/signup-with-password', ->
 describe 'POST /db/user/:handle/signup-with-facebook', ->
   facebookID = '12345'
   facebookEmail = 'some@email.com'
+  name = 'someusername'
   
-  validFacebookResponse = new Promise((resolve) -> resolve({ 
+  validFacebookResponse = new Promise((resolve) -> resolve({
     id: facebookID,
     email: facebookEmail,
     first_name: 'Some',
@@ -753,12 +821,12 @@ describe 'POST /db/user/:handle/signup-with-facebook', ->
     verified: true
   }))
   
-  invalidFacebookResponse = new Promise((resolve) -> resolve({ 
+  invalidFacebookResponse = new Promise((resolve) -> resolve({
     error: {
       message: 'Invalid OAuth access token.',
       type: 'OAuthException',
       code: 190,
-      fbtrace_id: 'EC4dEdeKHBH' 
+      fbtrace_id: 'EC4dEdeKHBH'
     }
   }))
   
@@ -772,7 +840,7 @@ describe 'POST /db/user/:handle/signup-with-facebook', ->
     spyOn(sendwithus.api, 'send')
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-facebook")
-    json = { email: facebookEmail, facebookID, facebookAccessToken: '...' }
+    json = { name, email: facebookEmail, facebookID, facebookAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(200)
     updatedUser = yield User.findById(user.id)
@@ -795,11 +863,11 @@ describe 'POST /db/user/:handle/signup-with-facebook', ->
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-facebook")
   
-    json = { email: 'some-other@email.com', facebookID, facebookAccessToken: '...' }
+    json = { name, email: 'some-other@email.com', facebookID, facebookAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(422)
   
-    json = { email: facebookEmail, facebookID: '54321', facebookAccessToken: '...' }
+    json = { name, email: facebookEmail, facebookID: '54321', facebookAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(422)
   
@@ -811,7 +879,7 @@ describe 'POST /db/user/:handle/signup-with-facebook', ->
     spyOn(facebook, 'fetchMe').and.returnValue(validFacebookResponse)
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-facebook")
-    json = { email: facebookEmail, facebookID, facebookAccessToken: '...' }
+    json = { name, email: facebookEmail, facebookID, facebookAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(409)
     done()
@@ -820,6 +888,7 @@ describe 'POST /db/user/:handle/signup-with-facebook', ->
 describe 'POST /db/user/:handle/signup-with-gplus', ->
   gplusID = '12345'
   gplusEmail = 'some@email.com'
+  name = 'someusername'
 
   validGPlusResponse = new Promise((resolve) -> resolve({
     id: gplusID
@@ -860,10 +929,11 @@ describe 'POST /db/user/:handle/signup-with-gplus', ->
     spyOn(sendwithus.api, 'send')
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-gplus")
-    json = { email: gplusEmail, gplusID, gplusAccessToken: '...' }
+    json = { name, email: gplusEmail, gplusID, gplusAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(200)
     updatedUser = yield User.findById(user.id)
+    expect(updatedUser.get('name')).toBe(name)
     expect(updatedUser.get('email')).toBe(gplusEmail)
     expect(updatedUser.get('gplusID')).toBe(gplusID)
     expect(sendwithus.api.send).toHaveBeenCalled()
@@ -873,7 +943,7 @@ describe 'POST /db/user/:handle/signup-with-gplus', ->
     spyOn(gplus, 'fetchMe').and.returnValue(invalidGPlusResponse)
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-gplus")
-    json = { email: gplusEmail, gplusID, gplusAccessToken: '...' }
+    json = { name, email: gplusEmail, gplusID, gplusAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(422)
     done()
@@ -883,23 +953,82 @@ describe 'POST /db/user/:handle/signup-with-gplus', ->
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-gplus")
 
-    json = { email: 'some-other@email.com', gplusID, gplusAccessToken: '...' }
+    json = { name, email: 'some-other@email.com', gplusID, gplusAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(422)
 
-    json = { email: gplusEmail, gplusID: '54321', gplusAccessToken: '...' }
+    json = { name, email: gplusEmail, gplusID: '54321', gplusAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(422)
 
     done()
 
   it 'returns 409 if there is already a user with the given email', utils.wrap (done) ->
-    yield utils.initUser({email: gplusEmail})
+    yield utils.initUser({name: 'someusername', email: gplusEmail})
     spyOn(gplus, 'fetchMe').and.returnValue(validGPlusResponse)
     user = yield utils.becomeAnonymous()
     url = getURL("/db/user/#{user.id}/signup-with-gplus")
-    json = { email: gplusEmail, gplusID, gplusAccessToken: '...' }
+    json = { name: 'differentusername', email: gplusEmail, gplusID, gplusAccessToken: '...' }
     [res, body] = yield request.postAsync({url, json})
     expect(res.statusCode).toBe(409)
     done()
     
+describe 'POST /db/user/:handle/destudent', ->
+  beforeEach utils.wrap (done) ->
+    yield utils.clearModels([User, Classroom, CourseInstance, Course, Campaign])
+    done()
+  
+  it 'removes a student user from all classrooms and unsets their role property', utils.wrap (done) ->
+    student1 = yield utils.initUser({role: 'student'})
+    student2 = yield utils.initUser({role: 'student'})
+    members = [student1._id, student2._id]
+
+    classroom = new Classroom({members})
+    yield classroom.save()
+    courseInstance = new CourseInstance({members})
+    yield courseInstance.save()
+
+    admin = yield utils.initAdmin()
+    yield utils.loginUser(admin)
+
+    url = getURL("/db/user/#{student1.id}/destudent")
+    [res, body] = yield request.postAsync({url, json:true})
+    
+    student1 = yield User.findById(student1.id)
+    student2 = yield User.findById(student2.id)
+    classroom = yield Classroom.findById(classroom.id)
+    courseInstance = yield CourseInstance.findById(courseInstance.id)
+    
+    expect(student1.get('role')).toBeUndefined()
+    expect(student2.get('role')).toBe('student')
+    expect(classroom.get('members').length).toBe(1)
+    expect(classroom.get('members')[0].toString()).toBe(student2.id)
+    expect(courseInstance.get('members').length).toBe(1)
+    expect(courseInstance.get('members')[0].toString()).toBe(student2.id)
+    done()
+
+describe 'POST /db/user/:handle/deteacher', ->
+  beforeEach utils.wrap (done) ->
+    yield utils.clearModels([User, TrialRequest])
+    done()
+
+  it 'removes a student user from all classrooms and unsets their role property', utils.wrap (done) ->
+    teacher = yield utils.initUser({role: 'teacher'})
+    yield utils.loginUser(teacher)
+    trialRequest = yield utils.makeTrialRequest(teacher)
+
+    admin = yield utils.initAdmin()
+    yield utils.loginUser(admin)
+
+    trialRequest = yield TrialRequest.findById(trialRequest.id)
+    expect(trialRequest).toBeDefined()
+    expect(teacher.get('role')).toBe('teacher')
+
+    url = getURL("/db/user/#{teacher.id}/deteacher")
+    [res, body] = yield request.postAsync({url, json:true})
+
+    trialRequest = yield TrialRequest.findById(trialRequest.id)
+    expect(trialRequest).toBeNull()
+    teacher = yield User.findById(teacher.id)
+    expect(teacher.get('role')).toBeUndefined()
+    done()
