@@ -49,7 +49,7 @@ module.exports = class DocFormatter
       @doc.type = 'snippet'
       @doc.owner = 'snippets'
       @doc.shortName = @doc.shorterName = @doc.title = @doc.name
-    else if @doc.owner in ['HTML', 'CSS']
+    else if @doc.owner in ['HTML', 'CSS', 'WebJavaScript', 'jQuery']
       @doc.shortName = @doc.shorterName = @doc.title = @doc.name
     else
       @doc.owner ?= 'this'
@@ -78,12 +78,15 @@ module.exports = class DocFormatter
       if @doc.type is 'function' and argString
         @doc.shortName = @doc.shorterName.replace argString, argNames
         @doc.shorterName = @doc.shorterName.replace argString, (if not /cast[A-Z]/.test(@doc.name) and argNames.length > 6 then '...' else argNames)
+      if @doc.type is 'event'
+        @doc.shortName = @doc.name
+        @doc.shorterName = @doc.name
       if @options.language is 'javascript'
         @doc.shorterName = @doc.shortName.replace ';', ''
-        if @doc.owner is 'this' or @options.tabbify
+        if @doc.owner is 'this' or @options.tabbify or ownerName is 'game'
           @doc.shorterName = @doc.shorterName.replace /^(this|hero)\./, ''
-      else if (@options.language in ['python', 'lua']) and (@doc.owner is 'this' or @options.tabbify)
-        @doc.shorterName = @doc.shortName.replace /^(self|hero)[:.]/, ''
+      else if (@options.language in ['python', 'lua']) and (@doc.owner is 'this' or @options.tabbify or ownerName is 'game')
+        @doc.shorterName = @doc.shortName.replace /^(self|hero|game)[:.]/, ''
       @doc.title = if @options.shortenize then @doc.shorterName else @doc.shortName
       translatedName = utils.i18n(@doc, 'name')
       if translatedName isnt @doc.name
@@ -165,7 +168,19 @@ module.exports = class DocFormatter
     [docName, args] = @getDocNameAndArguments()
     argumentExamples = (arg.example or arg.default or arg.name for arg in @doc.args ? [])
     argumentExamples.unshift args[0] if args.length > argumentExamples.length
-    content = popoverTemplate doc: @doc, docName: docName, language: @options.language, value: @formatValue(), marked: marked, argumentExamples: argumentExamples, writable: @options.writable, selectedMethod: @options.selectedMethod, cooldowns: @inferCooldowns(), item: @options.item
+    content = popoverTemplate {
+      doc: @doc
+      docName: docName
+      language: @options.language
+      value: @formatValue()
+      marked: marked
+      argumentExamples: argumentExamples
+      writable: @options.writable
+      selectedMethod: @options.selectedMethod
+      cooldowns: @inferCooldowns()
+      item: @options.item
+      _: _
+    }
     owner = if @doc.owner is 'this' then @options.thang else window[@doc.owner]
     content = @replaceSpriteName content
     content = content.replace /\#\{(.*?)\}/g, (s, properties) => @formatValue downTheChain(owner, properties.split('.'))

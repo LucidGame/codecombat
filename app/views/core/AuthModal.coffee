@@ -1,9 +1,11 @@
+require('app/styles/modal/auth-modal.sass')
 ModalView = require 'views/core/ModalView'
 template = require 'templates/core/auth-modal'
 forms = require 'core/forms'
 User = require 'models/User'
-application  = require 'core/application'
 errors = require 'core/errors'
+RecoverModal = require 'views/core/RecoverModal'
+storage = require 'core/storage'
 
 module.exports = class AuthModal extends ModalView
   id: 'auth-modal'
@@ -16,17 +18,19 @@ module.exports = class AuthModal extends ModalView
     'click #gplus-login-btn': 'onClickGPlusLoginButton'
     'click #facebook-login-btn': 'onClickFacebookLoginButton'
     'click #close-modal': 'hide'
-
+    'click [data-toggle="coco-modal"][data-target="core/RecoverModal"]': 'openRecoverModal'
 
   # Initialization
-    
+
   initialize: (options={}) ->
     @previousFormInputs = options.initialValues or {}
     @previousFormInputs.emailOrUsername ?= @previousFormInputs.email or @previousFormInputs.username
 
-    # TODO: Switch to promises and state, rather than using defer to hackily enable buttons after render
-    application.gplusHandler.loadAPI({ success: => _.defer => @$('#gplus-login-btn').attr('disabled', false) })
-    application.facebookHandler.loadAPI({ success: => _.defer => @$('#facebook-login-btn').attr('disabled', false) })
+    unless me.onChinaInfra()
+      # TODO: Switch to promises and state, rather than using defer to hackily enable buttons after render
+      application.gplusHandler.loadAPI({ success: => _.defer => @$('#gplus-login-btn').attr('disabled', false) })
+      application.facebookHandler.loadAPI({ success: => _.defer => @$('#facebook-login-btn').attr('disabled', false) })
+    @subModalContinue = options.subModalContinue
 
   afterRender: ->
     super()
@@ -38,7 +42,7 @@ module.exports = class AuthModal extends ModalView
 
   onSignupInstead: (e) ->
     CreateAccountModal = require('./CreateAccountModal')
-    modal = new CreateAccountModal({initialValues: forms.formToObject @$el})
+    modal = new CreateAccountModal({initialValues: forms.formToObject @$el, @subModalContinue})
     currentView.openModalView(modal)
 
   onSubmitForm: (e) ->
@@ -50,8 +54,8 @@ module.exports = class AuthModal extends ModalView
     res = tv4.validateMultiple userObject, formSchema
     return forms.applyErrorsToForm(@$el, res.errors) unless res.valid
     new Promise(me.loginPasswordUser(userObject.emailOrUsername, userObject.password).then)
-    .then(->
-      if window.nextURL then window.location.href = window.nextURL else window.location.reload()
+    .then(=>
+      if window.nextURL then window.location.href = window.nextURL else loginNavigate(@subModalContinue)
     )
     .catch((jqxhr) =>
       showingError = false
@@ -63,12 +67,12 @@ module.exports = class AuthModal extends ModalView
         if errorID is 'wrong-password'
           forms.setErrorToProperty(@$el, 'password', $.i18n.t('account_settings.wrong_password'))
           showingError = true
-      
+
       if not showingError
         @$('#unknown-error-alert').removeClass('hide')
     )
-      
-  
+
+
   # Google Plus
 
   onClickGPlusLoginButton: ->
@@ -85,7 +89,7 @@ module.exports = class AuthModal extends ModalView
             existingUser.fetchGPlusUser(gplusAttrs.gplusID, {
               success: =>
                 me.loginGPlusUser(gplusAttrs.gplusID, {
-                  success: -> window.location.reload()
+                  success: => loginNavigate(@subModalContinue)
                   error: @onGPlusLoginError
                 })
               error: @onGPlusLoginError
@@ -98,8 +102,8 @@ module.exports = class AuthModal extends ModalView
     btn.find('.sign-in-blurb').text($.i18n.t('login.sign_in_with_gplus'))
     btn.attr('disabled', false)
     errors.showNotyNetworkError(arguments...)
-    
-    
+
+
   # Facebook
 
   onClickFacebookLoginButton: ->
@@ -116,20 +120,23 @@ module.exports = class AuthModal extends ModalView
             existingUser.fetchFacebookUser(facebookAttrs.facebookID, {
               success: =>
                 me.loginFacebookUser(facebookAttrs.facebookID, {
-                  success: -> window.location.reload()
+                  success: => loginNavigate(@subModalContinue)
                   error: @onFacebookLoginError
                 })
               error: @onFacebookLoginError
             })
         })
     })
-    
+
   onFacebookLoginError: =>
     btn = @$('#facebook-login-btn')
     btn.find('.sign-in-blurb').text($.i18n.t('login.sign_in_with_facebook'))
     btn.attr('disabled', false)
     errors.showNotyNetworkError(arguments...)
 
+  openRecoverModal: (e) ->
+    e.stopPropagation()
+    @openModalView new RecoverModal()
 
   onHidden: ->
     super()
@@ -148,3 +155,12 @@ formSchema = {
   }
   required: ['emailOrUsername', 'password']
 }
+
+loginNavigate = (subModalContinue) ->
+  if me.isStudent() and not me.isAdmin()
+    application.router.navigate('/students', {trigger: true})
+  else if me.isTeacher() and not me.isAdmin()
+    application.router.navigate('/teachers/classes', {trigger: true})
+  else if subModalContinue
+    storage.save('sub-modal-continue', subModalContinue)
+  window.location.reload()

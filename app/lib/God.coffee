@@ -7,6 +7,7 @@ World = require 'lib/world/world'
 CocoClass = require 'core/CocoClass'
 Angel = require 'lib/Angel'
 GameUIState = require 'models/GameUIState'
+errors = require 'core/errors'
 
 module.exports = class God extends CocoClass
   @nicks: ['Athena', 'Baldr', 'Crom', 'Dagr', 'Eris', 'Freyja', 'Great Gish', 'Hades', 'Ishtar', 'Janus', 'Khronos', 'Loki', 'Marduk', 'Negafook', 'Odin', 'Poseidon', 'Quetzalcoatl', 'Ra', 'Shiva', 'Thor', 'Umvelinqangi', 'Týr', 'Vishnu', 'Wepwawet', 'Xipe Totec', 'Yahweh', 'Zeus', '上帝', 'Tiamat', '盘古', 'Phoebe', 'Artemis', 'Osiris', '嫦娥', 'Anhur', 'Teshub', 'Enlil', 'Perkele', 'Chaos', 'Hera', 'Iris', 'Theia', 'Uranus', 'Stribog', 'Sabazios', 'Izanagi', 'Ao', 'Tāwhirimātea', 'Tengri', 'Inmar', 'Torngarsuk', 'Centzonhuitznahua', 'Hunab Ku', 'Apollo', 'Helios', 'Thoth', 'Hyperion', 'Alectrona', 'Eos', 'Mitra', 'Saranyu', 'Freyr', 'Koyash', 'Atropos', 'Clotho', 'Lachesis', 'Tyche', 'Skuld', 'Urðr', 'Verðandi', 'Camaxtli', 'Huhetotl', 'Set', 'Anu', 'Allah', 'Anshar', 'Hermes', 'Lugh', 'Brigit', 'Manannan Mac Lir', 'Persephone', 'Mercury', 'Venus', 'Mars', 'Azrael', 'He-Man', 'Anansi', 'Issek', 'Mog', 'Kos', 'Amaterasu Omikami', 'Raijin', 'Susanowo', 'Blind Io', 'The Lady', 'Offler', 'Ptah', 'Anubis', 'Ereshkigal', 'Nergal', 'Thanatos', 'Macaria', 'Angelos', 'Erebus', 'Hecate', 'Hel', 'Orcus', 'Ishtar-Deela Nakh', 'Prometheus', 'Hephaestos', 'Sekhmet', 'Ares', 'Enyo', 'Otrera', 'Pele', 'Hadúr', 'Hachiman', 'Dayisun Tngri', 'Ullr', 'Lua', 'Minerva']
@@ -46,6 +47,8 @@ module.exports = class God extends CocoClass
       angelCount = options.maxAngels
     else if window.application.isIPadApp
       angelCount = 1
+    else if @indefiniteLength  # Don't do much with angels in game-dev, will mostly be synchronous
+      angelCount = 1
     else
       angelCount = 2
 
@@ -72,15 +75,15 @@ module.exports = class God extends CocoClass
     @lastFixedSeed = e.fixedSeed
     @lastFlagHistory = (flag for flag in e.flagHistory when flag.source isnt 'code')
     @lastDifficulty = e.difficulty
-    @createWorld e.spells, e.preload, e.realTime, e.justBegin
+    @createWorld e
 
-  createWorld: (spells, preload, realTime, justBegin) ->
+  createWorld: ({spells, preload, realTime, justBegin, keyValueDb, synchronous}) ->
     console.log "#{@nick}: Let there be light upon #{@level.name}! (preload: #{preload})"
     userCodeMap = @getUserCodeMap spells
 
     # We only want one world being simulated, so we abort other angels, unless we had one preloading this very code.
     hadPreloader = false
-    for angel in @angelsShare.busyAngels
+    for angel in @angelsShare.busyAngels.slice()
       isPreloading = angel.running and angel.work.preload and _.isEqual angel.work.userCodeMap, userCodeMap, (a, b) ->
         return a.raw is b.raw if a?.raw? and b?.raw?
         undefined  # Let default equality test suffice.
@@ -106,10 +109,12 @@ module.exports = class God extends CocoClass
       goals: @angelsShare.goalManager?.getGoals()
       headless: @angelsShare.headless
       preload
-      synchronous: not Worker?  # Profiling world simulation is easier on main thread, or we are IE9.
+      synchronous: synchronous ? not Worker?  # Profiling world simulation is easier on main thread, or we are IE9.
       realTime
       justBegin
       indefiniteLength: @indefiniteLength and realTime
+      keyValueDb
+      language: me.get('preferredLanguage', true)  # TODO: get target user's language if we're simulating some other user's session?
     }
     @angelsShare.workQueue.push work
     angel.workIfIdle() for angel in @angelsShare.angels
@@ -148,6 +153,7 @@ module.exports = class God extends CocoClass
   createDebugWorker: ->
     worker = new Worker '/javascripts/workers/worker_world.js'
     worker.addEventListener 'message', @onDebugWorkerMessage
+    worker.addEventListener 'error', errors.onWorkerError
     worker
 
   onDebugWorkerMessage: (event) =>

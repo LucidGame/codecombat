@@ -25,17 +25,16 @@
   ],
   "dependencies": {
     "jquery": "~2.1.0",
-    "lodash": "~2.4.1",
     "backbone": "1.1.0",
     "jquery-mousewheel": "~3.1.9",
     "i18next": "https://github.com/nwinter/i18next.git",
-    "firepad": "~0.1.2",
     "marked": "~0.3.0",
-    "moment": "~2.5.0",
+    "moment": "~2.19.0",
+    "ace-builds": "ajaxorg/ace-builds#ba3b91e04a5aa559d56ac70964f9054baa0f4caf",
     "aether": "~0.5.21",
     "underscore.string": "~2.3.3",
     "d3": "~3.4.4",
-    "jsondiffpatch": "0.1.8",
+    "jsondiffpatch": "^0.2.3",
     "nanoscroller": "~0.8.0",
     "treema": "https://github.com/codecombat/treema.git#master",
     "bootstrap": "~3.2.0",
@@ -45,11 +44,15 @@
     "fastclick": "~1.0.3",
     "three.js": "~0.71.0",
     "lscache": "~1.0.5",
-    "esper.js": "http://files.codecombat.com/esper.tar.gz",
+    "esper.js": "http://files.codecombat.com/esper-2018-06-28.tar.gz",
     "algoliasearch": "^3.13.1",
     "algolia-autocomplete.js": "^0.17.0",
     "algolia-autocomplete-no-conflict": "1.0.0",
-    "promise-polyfill": "^5.2.1"
+    "promise-polyfill": "^5.2.1",
+    "font-awesome": "fontawesome#^4.7.0",
+    "fetch": "^2.0.2",
+    "vimeo-player-js": "^2.1.0",
+    "cookieconsent": "^3.0.6"
   },
   "overrides": {
     "algolia-autocomplete.js": {
@@ -72,9 +75,9 @@
     },
     "jsondiffpatch": {
       "main": [
-        "build/bundle-full.js",
-        "build/formatters.js",
-        "src/formatters/html.css"
+        "public/build/jsondiffpatch-full.js",
+        "public/build/jsondiffpatch-formatters.js",
+        "public/formatters-styles/html.css"
       ]
     },
     "treema": {
@@ -106,6 +109,9 @@
         "build/java.js",
         "build/html.js"
       ]
+    },
+    "moment": {
+      "main": "min/moment-with-locales.min.js"
     }
   },
   "devDependencies": {

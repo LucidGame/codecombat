@@ -45,7 +45,7 @@ module.exports.applyErrorsToForm = (el, errors, warning=false) ->
   for error in errors
     if error.code is tv4.errorCodes.OBJECT_REQUIRED
       prop = _.last(_.string.words(error.message)) # hack
-      message = 'Required field'
+      message = $.i18n.t('common.required_field')
     
     else if error.dataPath
       prop = error.dataPath[1..]
@@ -111,7 +111,11 @@ module.exports.updateSelects = (el) ->
 module.exports.validateEmail = (email) ->
   filter = /^[A-Z0-9._%+-]+@[A-Z0-9.-]+\.[A-Z]{2,63}$/i  # https://news.ycombinator.com/item?id=5763990
   return filter.test(email)
-  
+
+module.exports.validatePhoneNumber = (phoneNumber) ->
+  filter = /^\D*(\d\D*){10,}$/i  # Just make sure there's at least 10 digits
+  return filter.test(phoneNumber)
+
 module.exports.disableSubmit = (el, message='...') ->
   $el = $(el)
   $el.data('original-text', $el.text())

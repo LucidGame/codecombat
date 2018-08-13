@@ -1,10 +1,12 @@
 CocoClass = require 'core/CocoClass'
 utils = require 'core/utils'
+THREE = require('three')
+window.SPE = require('exports-loader?SPE!imports-loader?THREE=three!vendor/scripts/ShaderParticles')
 
 module.exports = ParticleMan = class ParticleMan extends CocoClass
 
   constructor: ->
-    return @unsupported = true unless Modernizr.webgl
+    return @unsupported = true unless Modernizr?.webgl # TODO: Fix with Webpack
     try
       @renderer = new THREE.WebGLRenderer alpha: true
     catch err
@@ -84,7 +86,6 @@ module.exports = ParticleMan = class ParticleMan extends CocoClass
 
   addEmitter: (x, y, kind="level-dungeon-premium") ->
     return if @unsupported
-    kind = kind.replace 'intro', 'dungeon'
     options = $.extend true, {}, particleKinds[kind]
     return console.error "Couldn't find particle configuration for", kind unless options.group
     options.group.texture = THREE.ImageUtils.loadTexture "/images/common/particles/#{options.group.texture}.png"

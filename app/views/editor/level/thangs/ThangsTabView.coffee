@@ -1,3 +1,4 @@
+require('app/styles/editor/level/thangs-tab-view.sass')
 CocoView = require 'views/core/CocoView'
 AddThangsView = require './AddThangsView'
 thangs_template = require 'templates/editor/level/thangs-tab-view'
@@ -9,9 +10,10 @@ CocoCollection = require 'collections/CocoCollection'
 Surface = require 'lib/surface/Surface'
 Thang = require 'lib/world/thang'
 LevelThangEditView = require './LevelThangEditView'
-ComponentsCollection = require 'collections/ComponentsCollection'
-require 'vendor/treema'
+LevelComponents = require 'collections/LevelComponents'
+require 'lib/setupTreema'
 GameUIState = require 'models/GameUIState'
+GenerateTerrainModal = require 'views/editor/level/modals/GenerateTerrainModal'
 
 # Moving the screen while dragging thangs constants
 MOVE_MARGIN = 0.15
@@ -52,6 +54,7 @@ module.exports = class ThangsTabView extends CocoView
     'click #thangs-palette-toggle': 'toggleThangsPalette'
 #    'click .add-thang-palette-icon': 'toggleThangsPalette'
     'click #rotation-menu-item button': 'onClickRotationButton'
+    'click [data-toggle="coco-modal"][data-target="editor/level/modals/GenerateTerrainModal"]': 'openGenerateTerrainModal'
 
   shortcuts:
     'esc': 'selectAddThang'
@@ -85,7 +88,13 @@ module.exports = class ThangsTabView extends CocoView
     # should load depended-on Components, too
     @thangTypes = @supermodel.loadCollection(new ThangTypeSearchCollection(), 'thangs').model
     # just loading all Components for now: https://github.com/codecombat/codecombat/issues/405
-    @componentCollection = @supermodel.loadCollection(new ComponentsCollection(), 'components').load()
+    @componentCollection = new LevelComponents([], {saveBackups: true})
+    @supermodel.trackRequest(@componentCollection.fetch())
+    @listenToOnce(@componentCollection, 'sync', ->
+      for component in @componentCollection.models
+        component.url = "/db/level.component/#{component.get('original')}/version/#{component.get('version').major}"
+        @supermodel.registerModel(component)
+    )
     @level = options.level
     @onThangsChanged = _.debounce(@onThangsChanged)
 
@@ -135,6 +144,10 @@ module.exports = class ThangsTabView extends CocoView
     if _.keys(@thangsTreema.data).length
       @$el.find('#canvas-overlay').css('display', 'none')
 
+  openGenerateTerrainModal: (e) ->
+    e.stopPropagation()
+    @openModalView new GenerateTerrainModal()
+  
   onFilterExtantThangs: (e) ->
     @$el.find('#extant-thangs-filter button.active').button('toggle')
     button = $(e.target).closest('button')
@@ -529,6 +542,7 @@ module.exports = class ThangsTabView extends CocoView
       @thangsTreema.delete(@pathForThang(thang))
       @deleteEmptyTreema(thang)
       Thang.resetThangIDs()  # TODO: find some way to do this when we delete from treema, too
+    @gameUIState.set('selected', [])
 
   deleteEmptyTreema: (thang)->
     thangType = @supermodel.getModelByOriginal ThangType, thang.thangType

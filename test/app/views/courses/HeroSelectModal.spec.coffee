@@ -1,5 +1,6 @@
 HeroSelectModal = require 'views/courses/HeroSelectModal'
 factories = require 'test/app/factories'
+api = require 'core/api'
 
 describe 'HeroSelectModal', ->
 
@@ -13,24 +14,41 @@ describe 'HeroSelectModal', ->
 
   beforeEach (done) ->
     window.me = user = factories.makeUser({ heroConfig: { thangType: hero1.get('original') } })
-    modal = new HeroSelectModal({ currentHeroID: hero1.id })
-    modal.heroes.fakeRequests[0].respondWith({ status: 200, responseText: heroesResponse })
+    heroesPromise = Promise.resolve([hero1.attributes, hero2.attributes])
+    spyOn(api.thangTypes, 'getHeroes').and.returnValue(heroesPromise)
+    modal = new HeroSelectModal()
+    subview = modal.subviews.hero_select_view
     jasmine.demoModal(modal)
-    _.defer ->
-      modal.render()
-      done()
+    heroesPromise.then ->
+      _.defer ->
+        modal.render()
+        done()
 
   afterEach ->
     modal.stopListening()
 
   it 'highlights the current hero', ->
-    expect(modal.$(".hero-option[data-hero-id='#{hero1.id}']")[0].className.split(" ")).toContain('selected')
+    expect(modal.$(".hero-option[data-hero-original='#{hero1.get('original')}']")?[0]?.className.split(" ")).toContain('selected')
 
   it 'saves when you change heroes', (done) ->
-    modal.$(".hero-option[data-hero-id='#{hero2.id}']").click()
-    _.defer ->
+    modal.$(".hero-option[data-hero-original='#{hero2.get('original')}']").click()
+    setTimeout -> # TODO Webpack: Figure out how to not need this race condition
       expect(user.fakeRequests.length).toBe(1)
       request = user.fakeRequests[0]
-      expect(request.method).toBe("PUT")
-      expect(JSON.parse(request.params).heroConfig?.thangType).toBe(hero2.get('original'))
+      expect(request?.method).toBe("PUT")
+      expect(JSON.parse(request?.params).heroConfig?.thangType).toBe(hero2.get('original'))
       done()
+    , 500
+
+  it 'triggers its events properly', (done) ->
+    spyOn(modal, 'trigger')
+    modal.render()
+    modal.$('.hero-option:nth-child(2)').click()
+    request = jasmine.Ajax.requests.mostRecent()
+    request.respondWith({ status: 200, responseText: me.attributes })
+    expect(modal.trigger).toHaveBeenCalled()
+    expect(modal.trigger.calls.argsFor(0)[0]).toBe('hero-select:success')
+    expect(modal.trigger).not.toHaveBeenCalledWith('hide')
+    modal.$('.select-hero-btn').click()
+    expect(modal.trigger).toHaveBeenCalledWith('hide')
+    done()

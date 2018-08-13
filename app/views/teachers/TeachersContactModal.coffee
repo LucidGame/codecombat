@@ -1,3 +1,4 @@
+require('app/styles/teachers/teachers-contact-modal.sass')
 ModalView = require 'views/core/ModalView'
 State = require 'models/State'
 TrialRequests = require 'collections/TrialRequests'
@@ -30,11 +31,12 @@ module.exports = class TeachersContactModal extends ModalView
     trialRequest = @trialRequests.first()
     props = trialRequest?.get('properties') or {}
     name = if props.firstName and props.lastName then "#{props.firstName} #{props.lastName}" else me.get('name') ? ''
-    email = props.email or me.get('email') or ''
+    email = me.get('email') or props.email or ''
     message = """
         Hi CodeCombat! I want to learn more about the Classroom experience and get licenses so that my students can access Computer Science 2 and on.
 
-        Name of School/District: #{props.organization or ''}
+        Name of School #{props.nces_name or props.organization or ''}
+        Name of District: #{props.nces_district or props.district or ''}
         Role: #{props.role or ''}
         Phone Number: #{props.phoneNumber or ''}
       """
@@ -66,11 +68,14 @@ module.exports = class TeachersContactModal extends ModalView
       data
       context: @
       success: ->
+        window.tracker?.trackEvent 'Teacher Contact',
+          category: 'Contact',
+          licensesNeeded: formValues.licensesNeeded
         @state.set({ sendingState: 'sent' })
-        me.set('enrollmentRequestSent', true)
         setTimeout(=>
           @hide?()
         , 3000)
       error: -> @state.set({ sendingState: 'error' })
     })
-
+    
+    @trigger('submit')

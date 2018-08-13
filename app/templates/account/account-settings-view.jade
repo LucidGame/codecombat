@@ -56,19 +56,19 @@ else
                 span.spr= '.'
                 // TODO: show better summary states, like active, subscribed, free, and active until.
                 a(href="/account/subscription", data-i18n="account_settings.manage_subscription")
-                
-    
+
+      // TODO: allow users to pick their avatars from our preset list now that we killed Gravatar and file uploads
+      //.panel.panel-default
+      //  .panel-heading
+      //    .panel-title(data-i18n="account_settings.picture_tab")
+      //  #profile-photo-panel-body.panel-body
+      //    img.profile-photo(src=me.getPhotoURL(230), draggable="false")
+      //    .text-center
+      //      a(href="https://gravatar.com/", data-i18n="account_settings.use_gravatar")
+
       .panel.panel-default
         .panel-heading
-          .panel-title(data-i18n="account_settings.picture_tab")
-        #profile-photo-panel-body.panel-body
-          img.profile-photo(src=me.getPhotoURL(230), draggable="false")
-          input#photoURL(type="hidden", value=me.get('photoURL')||'')
-          button#upload-photo-button.btn.form-control.btn-primary(data-i18n="account_settings.upload_picture")
-    
-      .panel.panel-default
-        .panel-heading
-          .panel-title(data-i18n="account_settings.password_tab")
+          .panel-title(data-i18n="general.password")
         .panel-body
           .form
             .form-group

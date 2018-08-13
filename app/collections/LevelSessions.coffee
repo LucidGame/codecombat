@@ -6,8 +6,9 @@ module.exports = class LevelSessionCollection extends CocoCollection
   model: LevelSession
 
   fetchForCourseInstance: (courseInstanceID, options) ->
+    userID = options?.userID or me.id
     options = _.extend({
-      url: "/db/course_instance/#{courseInstanceID}/my-course-level-sessions"
+      url: "/db/course_instance/#{courseInstanceID}/course-level-sessions/#{userID}"
     }, options)
     @fetch(options)
 
@@ -17,7 +18,7 @@ module.exports = class LevelSessionCollection extends CocoCollection
       url: "/db/classroom/#{classroomID}/member-sessions"
     }, options)
     @fetch(options)
-    
+
   fetchForAllClassroomMembers: (classroom, options={}) ->
     limit = 10
     skip = 0
@@ -32,3 +33,10 @@ module.exports = class LevelSessionCollection extends CocoCollection
       jqxhrs.push(@fetchForClassroomMembers(classroom.id, options))
       skip += limit
     return jqxhrs
+
+  fetchRecentSessions: (options={}) ->
+    # Params: slug, limit, codeLanguage
+    options = _.extend({
+      url: "/db/level.session/-/recent"
+    }, options)
+    @fetch(options)

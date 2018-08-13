@@ -1,5 +1,17 @@
 // TODO: don't serve this script from codecombat.com; serve it from a harmless extra domain we don't have yet.
 
+var lastSource = null;
+var lastOrigin = null;
+window.onerror = function(message, url, line, column, error){
+  console.log("User script error on line " + line + ", column " + column + ": ", error);
+  lastSource.postMessage({
+    type: 'error',
+    message: message,
+    url: url,
+    line: line || 0,
+    column: column || 0,
+  }, lastOrigin);
+}
 window.addEventListener('message', receiveMessage, false);
 
 var concreteDom;
@@ -9,14 +21,14 @@ var virtualDom;
 var virtualStyles;
 var virtualScripts;
 var goalStates;
+var createFailed;
 
 var allowedOrigins = [
-    /https:\/\/codecombat\.com/,
-    /http:\/\/localhost:3000/,
-    /http:\/\/direct\.codecombat\.com/,
-    /http:\/\/staging\.codecombat\.com/,
-    /http:\/\/next\.codecombat\.com/,
-    /http:\/\/.*codecombat-staging-codecombat\.runnableapp\.com/,
+    /^https?:\/\/(.*\.)?codecombat\.com$/,
+    /^https?:\/\/localhost:[\d]+$/, // For local development
+    /^https?:\/\/10.0.2.2:[\d]+$/, // For local virtual machines
+    /^https?:\/\/coco\.code\.ninja$/,
+    /^https?:\/\/.*codecombat-staging-codecombat\.runnableapp\.com$/,
 ];
 
 function receiveMessage(event) {
@@ -29,19 +41,26 @@ function receiveMessage(event) {
         console.log('Ignoring message from bad origin:', origin);
         return;
     }
+    lastOrigin = origin;
     var data = event.data;
-    var source = event.source;
+    var source = lastSource = event.source;
     switch (data.type) {
     case 'create':
         create(_.pick(data, 'dom', 'styles', 'scripts'));
         checkGoals(data.goals, source, origin);
+        $('body').first().off('click', checkRememberedGoals);
+        $('body').first().on('click', checkRememberedGoals);
         break;
     case 'update':
-        if (virtualDom)
+        if (virtualDom && !createFailed)
             update(_.pick(data, 'dom', 'styles', 'scripts'));
         else
             create(_.pick(data, 'dom', 'styles', 'scripts'));
         checkGoals(data.goals, source, origin);
+        break;
+    case 'highlight-css-selector':
+        $('*').css('box-shadow', '');
+        $(data.selector).css('box-shadow', 'inset 0 0 2px 2px rgba(255, 255, 0, 1.0), 0 0 2px 2px rgba(255, 255, 0, 1.0)');
         break;
     case 'log':
         console.log(data.text);
@@ -51,17 +70,55 @@ function receiveMessage(event) {
     }
 }
 
-function create({ dom, styles, scripts }) {
-    virtualDom = dom;
-    virtualStyles = styles;
-    virtualScripts = scripts;
-    concreteDom = deku.dom.create(dom);
-    concreteStyles = deku.dom.create(styles);
-    concreteScripts = deku.dom.create(scripts);
-    // TODO: :after elements don't seem to work? (:before do)
-    $('body').first().empty().append(concreteDom);
-    replaceNodes('[for="player-styles"]', unwrapConcreteNodes(concreteStyles));
-    replaceNodes('[for="player-scripts"]', unwrapConcreteNodes(concreteScripts));
+function create(options) {
+    try {
+        virtualDom = options.dom;
+        virtualStyles = options.styles;
+        virtualScripts = options.scripts;
+        concreteDom = deku.dom.create(virtualDom);
+        concreteStyles = deku.dom.create(virtualStyles);
+        concreteScripts = deku.dom.create(virtualScripts);
+        // TODO: :after elements don't seem to work? (:before do)
+        $('body').first().empty().append(concreteDom);
+        replaceNodes('[for="player-styles"]', unwrapConcreteNodes(concreteStyles));
+        replaceNodes('[for="player-scripts"]', unwrapConcreteNodes(concreteScripts));
+        createFailed = false;
+    } catch(e) {
+        createFailed = true;
+        $('.loading-message').addClass('hidden')
+        $('.loading-error').removeClass('hidden')
+        const errPos = parseStackTrace(e.stack);
+        lastSource.postMessage({
+          type: 'error',
+          message: e.name+": "+e.message,
+          line: errPos.line,
+          column: errPos.column,
+        }, lastOrigin);
+    }
+}
+
+function parseStackTrace(trace) {
+    const lines = trace.split('\n')
+    const regexes = [
+      /.*?at .*? \(eval at globalEval.*?\).*?,.*?(\d+):(\d+)\)$/, // Chrome stacktrace formatting
+      /@.*eval:(\d+):(\d+)$/, // Firefox stacktrace formatting
+      /at eval code \(eval code:(\d+):(\d+)\)$/, // Internet Explorer stacktrace formatting
+      // Safari doesn't include line numbers for eval in stack trace
+    ]
+    var matchedLine;
+    for (var i = 0; i < regexes.length; i++) {
+        var regex = regexes[i];
+        matchedLine = _.find(lines, function(line) {
+            return regex.test(line)
+        })
+        if (!matchedLine) continue;
+        const match = matchedLine.match(regex);
+        return {
+            line: Number(match[1]),
+            column: Number(match[2]),
+        }
+    }
+    if (!matchedLine) return { line: 0, column: 0 };
 }
 
 function unwrapConcreteNodes(wrappedNodes) {
@@ -69,23 +126,29 @@ function unwrapConcreteNodes(wrappedNodes) {
 }
 
 function replaceNodes(selector, newNodes){
-    $newNodes = $(newNodes).clone()
+    var $newNodes = $(newNodes).clone();
     $(selector + ':not(:first)').remove();
     
-    firstNode = $(selector).first();
-    $newNodes.attr('for', firstNode.attr('for'));
+    var firstNode = $(selector).first();
+    $newNodes.attr('for', firstNode.attr('for'))
     
-    newFirstNode = $newNodes[0];
-    try {
-      firstNode.replaceWith(newFirstNode); // Removes newFirstNode from its array (!!)
-    } catch (e) {
-      console.log('Failed to update some nodes:', e);
-    }
+    // Workaround for an IE bug where style nodes created by Deku aren't read
+    // Resetting innerText strips the newlines from it
+    var recreatedNodes = $newNodes.toArray();
+    recreatedNodes.forEach(function(node){
+      node.innerHTML = node.innerHTML.trim();
+    })
+
+    var newFirstNode = recreatedNodes[0];
+    firstNode.replaceWith(newFirstNode);
     
-    $(newFirstNode).after($newNodes);
+    $(newFirstNode).after(_.tail(recreatedNodes));
 }
 
-function update({ dom, styles, scripts }) {
+function update(options) {
+    var dom = options.dom;
+    var styles = options.styles;
+    var scripts = options.scripts;
     function dispatch() {}  // Might want to do something here in the future
     var context = {};  // Might want to use this to send shared state to every component
 
@@ -105,7 +168,13 @@ function update({ dom, styles, scripts }) {
     virtualScripts = scripts;
 }
 
+var lastGoalArgs = [];
+function checkRememberedGoals() {
+    checkGoals.apply(this, lastGoalArgs);
+}
+
 function checkGoals(goals, source, origin) {
+    lastGoalArgs = [goals, source, origin]; // Memoize for checkRememberedGoals
     // Check right now and also in one second, since our 1-second CSS transition might be affecting things until it is done.
     doCheckGoals(goals, source, origin);
     _.delay(function() { doCheckGoals(goals, source, origin); }, 1001);
@@ -152,7 +221,7 @@ function downTheChain(obj, keyChain) {
         keyChain = keyChain.slice(1);
     }
     return value;
-};
+}
 
 function matchesCheck(value, check) {
     var v = downTheChain(value, check.eventProps);

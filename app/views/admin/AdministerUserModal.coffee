@@ -1,3 +1,4 @@
+require('app/styles/admin/administer-user-modal.sass')
 ModalView = require 'views/core/ModalView'
 template = require 'templates/admin/administer-user-modal'
 User = require 'models/User'
@@ -5,6 +6,10 @@ Prepaid = require 'models/Prepaid'
 StripeCoupons = require 'collections/StripeCoupons'
 forms = require 'core/forms'
 Prepaids = require 'collections/Prepaids'
+Classrooms = require 'collections/Classrooms'
+TrialRequests = require 'collections/TrialRequests'
+fetchJson = require('core/api/fetch-json')
+api = require 'core/api'
 
 module.exports = class AdministerUserModal extends ModalView
   id: 'administer-user-modal'
@@ -12,9 +17,18 @@ module.exports = class AdministerUserModal extends ModalView
 
   events:
     'click #save-changes': 'onClickSaveChanges'
+    'click #create-payment-btn': 'onClickCreatePayment'
     'click #add-seats-btn': 'onClickAddSeatsButton'
     'click #destudent-btn': 'onClickDestudentButton'
     'click #deteacher-btn': 'onClickDeteacherButton'
+    'click #reset-progress-btn': 'onClickResetProgressButton'
+    'click .update-classroom-btn': 'onClickUpdateClassroomButton'
+    'click .add-new-courses-btn': 'onClickAddNewCoursesButton'
+    'click .user-link': 'onClickUserLink'
+    'click #verified-teacher-checkbox': 'onClickVerifiedTeacherCheckbox'
+    'click .edit-prepaids-info-btn': 'onClickEditPrepaidsInfoButton'
+    'click .cancel-prepaid-info-edit-btn': 'onClickCancelPrepaidInfoEditButton'
+    'click .save-prepaid-info-btn': 'onClickSavePrepaidInfo'
 
   initialize: (options, @userHandle) ->
     @user = new User({_id:@userHandle})
@@ -22,8 +36,17 @@ module.exports = class AdministerUserModal extends ModalView
     @coupons = new StripeCoupons()
     @supermodel.trackRequest @coupons.fetch({cache: false})
     @prepaids = new Prepaids()
-    @supermodel.trackRequest @prepaids.fetchByCreator(@userHandle)
-    
+    @supermodel.trackRequest @prepaids.fetchByCreator(@userHandle, { data: {includeShared: true} })
+    @listenTo @prepaids, 'sync', =>
+      @prepaids.each (prepaid) =>
+        if prepaid.loaded and not prepaid.creator
+          prepaid.creator = new User()
+          @supermodel.trackRequest prepaid.creator.fetchCreatorOfPrepaid(prepaid)
+    @classrooms = new Classrooms()
+    @supermodel.trackRequest @classrooms.fetchByOwner(@userHandle)
+    @trialRequests = new TrialRequests()
+    @supermodel.trackRequest @trialRequests.fetchByApplicant(@userHandle)
+
   onLoaded: ->
     # TODO: Figure out a better way to expose this info, perhaps User methods?
     stripe = @user.get('stripe') or {}
@@ -32,13 +55,41 @@ module.exports = class AdministerUserModal extends ModalView
     @freeUntilDate = if @freeUntil then stripe.free else new Date().toISOString()[...10]
     @currentCouponID = stripe.couponID
     @none = not (@free or @freeUntil or @coupon)
+    @trialRequest = @trialRequests.first()
+    @prepaidTableState={}
     super()
-    
+
+  onClickCreatePayment: ->
+    service = @$('#payment-service').val()
+    amount = parseInt(@$('#payment-amount').val())
+    amount = 0 if isNaN(amount)
+    gems = parseInt(@$('#payment-gems').val())
+    gems = 0 if isNaN(gems)
+    if _.isEmpty(service)
+      alert('Service cannot be empty')
+      return
+    else if amount < 0
+      alert('Payment cannot be negative')
+      return
+    else if gems < 0
+      alert('Gems cannot be negative')
+      return
+
+    data = {
+      purchaser: @user.get('_id')
+      recipient: @user.get('_id')
+      service: service
+      created: new Date().toISOString()
+      gems: gems
+      amount: amount
+      description: @$('#payment-description').val()
+    }
+    $.post('/db/payment/admin', data, => @hide())
+
   onClickSaveChanges: ->
     stripe = _.clone(@user.get('stripe') or {})
     delete stripe.free
     delete stripe.couponID
-
     selection = @$el.find('input[name="stripe-benefit"]:checked').val()
     dateVal = @$el.find('#free-until-date').val()
     couponVal = @$el.find('#coupon-select').val()
@@ -46,8 +97,16 @@ module.exports = class AdministerUserModal extends ModalView
       when 'free' then stripe.free = true
       when 'free-until' then stripe.free = dateVal
       when 'coupon' then stripe.couponID = couponVal
-
     @user.set('stripe', stripe)
+
+    newGems = parseInt(@$('#stripe-add-gems').val())
+    newGems = 0 if isNaN(newGems)
+    if newGems > 0
+      purchased = _.clone(@user.get('purchased') ? {})
+      purchased.gems ?= 0
+      purchased.gems += newGems
+      @user.set('purchased', purchased)
+
     options = {}
     options.success = => @hide()
     @user.patch(options)
@@ -58,8 +117,9 @@ module.exports = class AdministerUserModal extends ModalView
     return unless _.all(_.values(attrs))
     return unless attrs.maxRedeemers > 0
     return unless attrs.endDate and attrs.startDate and attrs.endDate > attrs.startDate
-    attrs.startDate = new Date(attrs.startDate).toISOString()
-    attrs.endDate = new Date(attrs.endDate).toISOString()
+    attrs.endDate = attrs.endDate + " " + "23:59"   # Otherwise, it ends at 12 am by default which does not include the date indicated
+    attrs.startDate = moment.timezone.tz(attrs.startDate, "America/Los_Angeles").toISOString()
+    attrs.endDate = moment.timezone.tz(attrs.endDate, "America/Los_Angeles").toISOString()
     _.extend(attrs, {
       type: 'course'
       creator: @user.id
@@ -75,14 +135,14 @@ module.exports = class AdministerUserModal extends ModalView
       @renderSelectors('#prepaid-form')
 
   onClickDestudentButton: (e) ->
-    button = $(e.currentTarget)
+    button = @$(e.currentTarget)
     button.attr('disabled', true).text('...')
     Promise.resolve(@user.destudent())
     .then =>
       button.remove()
     .catch (e) =>
       button.attr('disabled', false).text('Destudent')
-      noty { 
+      noty {
         text: e.message or e.responseJSON?.message or e.responseText or 'Unknown Error'
         type: 'error'
       }
@@ -90,7 +150,7 @@ module.exports = class AdministerUserModal extends ModalView
         throw e
 
   onClickDeteacherButton: (e) ->
-    button = $(e.currentTarget)
+    button = @$(e.currentTarget)
     button.attr('disabled', true).text('...')
     Promise.resolve(@user.deteacher())
     .then =>
@@ -103,3 +163,87 @@ module.exports = class AdministerUserModal extends ModalView
       }
       if e.stack
         throw e
+
+  onClickResetProgressButton: ->
+    if confirm("Really RESET this person's progress?")
+      api.users.resetProgress({ userID: @user.id})
+
+  onClickUpdateClassroomButton: (e) ->
+    classroom = @classrooms.get(@$(e.currentTarget).data('classroom-id'))
+    if confirm("Really update #{classroom.get('name')}?")
+      Promise.resolve(classroom.updateCourses())
+      .then =>
+        noty({text: 'Updated classroom courses.'})
+        @renderSelectors('#classroom-table')
+      .catch ->
+        noty({text: 'Failed to update classroom courses.', type: 'error'})
+
+  onClickAddNewCoursesButton: (e) ->
+    classroom = @classrooms.get(@$(e.currentTarget).data('classroom-id'))
+    if confirm("Really update #{classroom.get('name')}?")
+      Promise.resolve(classroom.updateCourses({data: {addNewCoursesOnly: true}}))
+      .then =>
+        noty({text: 'Updated classroom courses.'})
+        @renderSelectors('#classroom-table')
+      .catch ->
+        noty({text: 'Failed to update classroom courses.', type: 'error'})
+
+  onClickUserLink: (e) ->
+    userID = @$(e.target).data('user-id')
+    @openModalView new AdministerUserModal({}, userID) if userID
+
+  userIsVerifiedTeacher: () ->
+    @user.get('verifiedTeacher')
+
+  onClickVerifiedTeacherCheckbox: (e) ->
+    checked = @$(e.target).prop('checked')
+    @userSaveState = 'saving'
+    @render()
+    fetchJson("/db/user/#{@user.id}/verifiedTeacher", {
+      method: 'PUT',
+      json: checked
+    }).then (res) =>
+      @userSaveState = 'saved'
+      @user.set('verifiedTeacher', res.verifiedTeacher)
+      @render()
+      setTimeout((()=>
+        @userSaveState = null
+        @render()
+      ), 2000)
+    null
+
+  onClickEditPrepaidsInfoButton: (e) ->
+    prepaidId=@$(e.target).data('prepaid-id')
+    @prepaidTableState[prepaidId] = 'editMode'
+    @renderSelectors('#'+prepaidId)
+
+  onClickCancelPrepaidInfoEditButton: (e) ->
+    @prepaidTableState[@$(e.target).data('prepaid-id')] = 'viewMode'
+    @renderSelectors('#'+@$(e.target).data('prepaid-id'))
+
+  onClickSavePrepaidInfo: (e) ->
+    prepaidId= @$(e.target).data('prepaid-id')  
+    prepaidStartDate= @$el.find('#'+'startDate-'+prepaidId).val()
+    prepaidEndDate= @$el.find('#'+'endDate-'+prepaidId).val()
+    prepaidTotalLicenses=@$el.find('#'+'totalLicenses-'+prepaidId).val()
+    @prepaids.each (prepaid) =>
+      if (prepaid.get('_id') == prepaidId) 
+        #validations
+        unless prepaidStartDate and prepaidEndDate and prepaidTotalLicenses
+          return 
+        if(prepaidStartDate >= prepaidEndDate)
+          alert('End date cannot be on or before start date')
+          return
+        if(prepaidTotalLicenses < (prepaid.get('redeemers') || []).length)
+          alert('Total number of licenses cannot be less than used licenses')
+          return
+        prepaid.set('startDate', moment.timezone.tz(prepaidStartDate, "America/Los_Angeles").toISOString())
+        prepaid.set('endDate',  moment.timezone.tz(prepaidEndDate, "America/Los_Angeles").toISOString())
+        prepaid.set('maxRedeemers', prepaidTotalLicenses)
+        options = {}
+        prepaid.patch(options)
+        @listenTo prepaid, 'sync', -> 
+          @prepaidTableState[prepaidId] = 'viewMode'
+          @renderSelectors('#'+prepaidId)
+        return
+ 

@@ -1,3 +1,4 @@
+require('app/styles/courses/courses-update-account-view.sass')
 errors = require 'core/errors'
 RootView = require 'views/core/RootView'
 template = require 'templates/courses/courses-update-account-view'
@@ -53,7 +54,7 @@ module.exports = class CoursesUpdateAccountView extends RootView
     me.becomeStudent({
       success: ->
         application.tracker?.trackEvent trackEventMsg, category: 'Courses Update Account'
-        application.router.navigate('/courses', {trigger: true})
+        application.router.navigate('/students', {trigger: true})
       error: ->
         $(targetElem).prop('disabled', false)
         errors.showNotyNetworkError(arguments...)

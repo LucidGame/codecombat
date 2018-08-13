@@ -1,3 +1,4 @@
+require('app/styles/play/level/tome/tome.sass')
 # There's one TomeView per Level. It has:
 # - a CastButtonView, which has
 #   - a cast button
@@ -24,6 +25,7 @@ template = require 'templates/play/level/tome/tome'
 Spell = require './Spell'
 SpellPaletteView = require './SpellPaletteView'
 CastButtonView = require './CastButtonView'
+utils = require 'core/utils'
 
 module.exports = class TomeView extends CocoView
   id: 'tome-view'
@@ -42,6 +44,11 @@ module.exports = class TomeView extends CocoView
 
   events:
     'click': 'onClick'
+
+  constructor: (options) ->
+    super options
+    unless options.god or options.level.get('type') is 'web-dev'
+      console.error "TomeView created with no God!"
 
   afterRender: ->
     super()
@@ -104,7 +111,7 @@ module.exports = class TomeView extends CocoView
         pathComponents[0] = _.string.slugify pathComponents[0]
         spellKey = pathComponents.join '/'
         @thangSpells[thang.id].push spellKey
-        skipProtectAPI = @getQueryVariable 'skip_protect_api', false
+        skipProtectAPI = utils.getQueryVariable 'skip_protect_api', false
         spell = @spells[spellKey] = new Spell
           hintsState: @options.hintsState
           programmableMethod: method
@@ -123,6 +130,7 @@ module.exports = class TomeView extends CocoView
           level: @options.level
           god: @options.god
           courseID: @options.courseID
+          courseInstanceID: @options.courseInstanceID
 
     for thangID, spellKeys of @thangSpells
       thang = @fakeProgrammableThang ? world.getThangByID thangID
@@ -139,13 +147,14 @@ module.exports = class TomeView extends CocoView
   onSpellLoaded: (e) ->
     for spellID, spell of @spells
       return unless spell.loaded
-    @cast()
+    justBegin = @options.level.isType('game-dev')
+    @cast false, false, justBegin
 
   onCastSpell: (e) ->
     # A single spell is cast.
-    @cast e?.preload, e?.realTime, e?.justBegin
+    @cast e?.preload, e?.realTime, e?.justBegin, e?.cinematic
 
-  cast: (preload=false, realTime=false, justBegin=false) ->
+  cast: (preload=false, realTime=false, justBegin=false, cinematic=false) ->
     return if @options.level.isType('web-dev')
     sessionState = @options.session.get('state') ? {}
     if realTime
@@ -156,16 +165,20 @@ module.exports = class TomeView extends CocoView
     difficulty = sessionState.difficulty ? 0
     if @options.observing
       difficulty = Math.max 0, difficulty - 1  # Show the difficulty they won, not the next one.
+    Backbone.Mediator.publish 'level:set-playing', {playing: false}
     Backbone.Mediator.publish 'tome:cast-spells', {
-      @spells, 
-      preload, 
-      realTime, 
-      justBegin, 
+      @spells,
+      preload,
+      realTime,
+      synchronous: @options.level.isType('game-dev') and not justBegin,
+      justBegin,
+      cinematic,
       difficulty,
       submissionCount: sessionState.submissionCount ? 0,
-      flagHistory: sessionState.flagHistory ? [], 
-      god: @options.god, 
-      fixedSeed: @options.fixedSeed
+      flagHistory: sessionState.flagHistory ? [],
+      god: @options.god,
+      fixedSeed: @options.fixedSeed,
+      keyValueDb: @options.session.get('keyValueDb') ? {}
     }
 
   onClick: (e) ->
@@ -188,10 +201,7 @@ module.exports = class TomeView extends CocoView
     @spellView?.setThang thang
 
   updateSpellPalette: (thang, spell) ->
-    return unless thang and @spellPaletteView?.thang isnt thang and (thang.programmableProperties or thang.apiProperties or thang.programmableHTMLProperties)
-    useHero = /hero/.test(spell.getSource()) or not /(self[\.\:]|this\.|\@)/.test(spell.getSource())
-    @spellPaletteView = @insertSubView new SpellPaletteView { thang, @supermodel, programmable: spell?.canRead(), language: spell?.language ? @options.session.get('codeLanguage'), session: @options.session, level: @options.level, courseID: @options.courseID, courseInstanceID: @options.courseInstanceID, useHero }
-    @spellPaletteView.toggleControls {}, spell.view.controlsEnabled if spell?.view   # TODO: know when palette should have been disabled but didn't exist
+    @options.playLevelView.updateSpellPalette thang, spell
 
   spellFor: (thang, spellName) ->
     return null unless thang?.isProgrammable
@@ -205,6 +215,9 @@ module.exports = class TomeView extends CocoView
     spell
 
   reloadAllCode: ->
+    if utils.getQueryVariable 'dev'
+      @options.playLevelView.spellPaletteView.destroy()
+      @updateSpellPalette @spellView.thang, @spellView.spell
     spell.view.reloadCode false for spellKey, spell of @spells when spell.view and (spell.team is me.team or (spell.team in ['common', 'neutral', null]))
     @cast false, false
 
@@ -229,11 +242,13 @@ module.exports = class TomeView extends CocoView
     return null unless hero = _.find @options.level.get('thangs'), id: 'Hero Placeholder'
     return null unless programmableConfig = _.find(hero.components, (component) -> component.config?.programmableMethods).config
     usesHTMLConfig = _.find(hero.components, (component) -> component.config?.programmableHTMLProperties).config
+    usesWebJavaScriptConfig = _.find(hero.components, (component) -> component.config?.programmableWebJavaScriptProperties)?.config
+    usesJQueryConfig = _.find(hero.components, (component) -> component.config?.programmableJQueryProperties)?.config
     console.warn "Couldn't find usesHTML config; is it presented and not defaulted on the Hero Placeholder?" unless usesHTMLConfig
     thang =
       id: 'Hero Placeholder'
       isProgrammable: true
-    thang = _.merge thang, programmableConfig, usesHTMLConfig
+    thang = _.merge thang, programmableConfig, usesHTMLConfig, usesWebJavaScriptConfig, usesJQueryConfig
     thang
 
   destroy: ->

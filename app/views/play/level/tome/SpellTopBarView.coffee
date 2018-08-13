@@ -1,3 +1,4 @@
+require('app/styles/play/level/tome/spell-top-bar-view.sass')
 template = require 'templates/play/level/tome/spell-top-bar-view'
 ReloadLevelModal = require 'views/play/level/modal/ReloadLevelModal'
 CocoView = require 'views/core/CocoView'
@@ -35,12 +36,13 @@ module.exports = class SpellTopBarView extends CocoView
     context.beautifyShortcutVerbose = "#{ctrl}+#{shift}+B: #{$.i18n.t 'keyboard_shortcuts.beautify'}"
     context.maximizeShortcutVerbose = "#{ctrl}+#{shift}+M: #{$.i18n.t 'keyboard_shortcuts.maximize_editor'}"
     context.codeLanguage = @options.codeLanguage
+    context.showAmazonLogo = application.getHocCampaign() is 'game-dev-hoc'
     context
 
   afterRender: ->
     super()
-    @$el.addClass 'spell-tab'
     @attachTransitionEventListener()
+    @$('[data-toggle="popover"]').popover()
 
   onDisableControls: (e) -> @toggleControls e, false
   onEnableControls: (e) -> @toggleControls e, true
@@ -51,10 +53,13 @@ module.exports = class SpellTopBarView extends CocoView
   onClickHintsButton: ->
     return unless @hintsState?
     @hintsState.set('hidden', not @hintsState.get('hidden'))
-    window.tracker?.trackEvent 'Hints Clicked', category: 'Students', levelSlug: @options.level.get('slug'), hintCount: @hintsState.get('hints')?.length ? 0, ['Mixpanel']
+    window.tracker?.trackEvent 'Hints Clicked', category: 'Students', levelSlug: @options.level.get('slug'), hintCount: @hintsState.get('hints')?.length ? 0, []
 
   onCodeReload: (e) ->
-    @openModalView new ReloadLevelModal()
+    if key.shift
+      Backbone.Mediator.publish 'level:restart', {}
+    else
+      @openModalView new ReloadLevelModal()
 
   onBeautifyClick: (e) ->
     return unless @controlsEnabled

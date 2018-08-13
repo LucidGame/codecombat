@@ -1,3 +1,4 @@
+require('app/styles/about.sass')
 RootView = require 'views/core/RootView'
 template = require 'templates/about'
 
@@ -40,6 +41,7 @@ module.exports = class AboutView extends RootView
     })
 
   afterInsert: ->
+    super()
     # scroll to the current hash, once everything in the browser is set up
     f = =>
       return if @destroyed
