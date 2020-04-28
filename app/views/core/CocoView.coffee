@@ -216,10 +216,15 @@ module.exports = class CocoView extends Backbone.View
     _.defer => @$el.find('.nano').nanoScroller() unless @destroyed
 
   updateProgress: (progress) ->
+    return if @destroyed
+
     @loadProgress.progress = progress if progress > @loadProgress.progress
     @updateProgressBar(progress)
 
-  updateProgressBar: (progress) =>
+  updateProgressBar: (progress) ->
+    return if @destroyed
+
+    @trigger('loading:progress', progress * 100)
     prog = "#{parseInt(progress*100)}%"
     @$el?.find('.loading-container .progress-bar').css('width', prog)
 
@@ -241,11 +246,10 @@ module.exports = class CocoView extends Backbone.View
     if me.isStudent()
       console.error("Student clicked contact modal.")
       return
+
     if me.isTeacher(true)
       if application.isProduction()
-        window.Intercom?('show')
-      else
-        alert('Teachers, Intercom widget only available in production.')
+        application.tracker.drift.sidebar.open()
     else
       ContactModal = require 'views/core/ContactModal'
       @openModalView(new ContactModal())
@@ -287,6 +291,8 @@ module.exports = class CocoView extends Backbone.View
     modalView.afterInsert()
     visibleModal = modalView
     modalOptions = {show: true, backdrop: if modalView.closesOnClickOutside then true else 'static'}
+    if typeof modalView.closesOnEscape is 'boolean' and modalView.closesOnEscape is false # by default, closes on escape, i.e. if modalView.closesOnEscape = undefined
+      modalOptions.keyboard = false
     $('#modal-wrapper .modal').modal(modalOptions).on 'hidden.bs.modal', @modalClosed
     window.currentModal = modalView
     @getRootView().stopListeningToShortcuts(true)
@@ -312,6 +318,7 @@ module.exports = class CocoView extends Backbone.View
   # Loading RootViews
 
   showLoading: ($el=@$el) ->
+    @trigger('loading:show')
     $el.find('>').addClass('hidden')
     $el.append(loadingScreenTemplate()).i18n()
     @applyRTLIfNeeded()
@@ -319,6 +326,7 @@ module.exports = class CocoView extends Backbone.View
 
   hideLoading: ->
     return unless @_lastLoading?
+    @trigger('loading:hide')
     @_lastLoading.find('.loading-screen').remove()
     @_lastLoading.find('>').removeClass('hidden')
     @_lastLoading = null

@@ -1,6 +1,45 @@
 describe 'Utility library', ->
   utils = require '../../../app/core/utils'
 
+  describe 'translatejs2cpp(jsCode, fullCode)', ->
+    describe 'do not add void main if fullCode set false', ->
+      it 'if there is no patten need translate', ->
+        expect(utils.translatejs2cpp('hero.moveRight()', false)).toBe('hero.moveRight()')
+      it 'if there is var x or var y', ->
+        expect(utils.translatejs2cpp('var x = 2;\nvar y = 3', false)).toBe('float x = 2;\nfloat y = 3')
+      it 'if there is ===/!==/and/or/not', ->
+        expect(utils.translatejs2cpp('a === 2 and b !== 1 or (not c)', false)).toBe('a == 2 && b != 1 || (!c)')
+      it 'if there is other var', ->
+        expect(utils.translatejs2cpp('var enemy = hero...', false)).toBe('auto enemy = hero...')
+      it 'if there is a function definition', ->
+        expect(utils.translatejs2cpp('function a() {}\n', false)).toBe('auto a() {}\n')
+      it 'if ther is a comment in if..else..', ->
+        expect(utils.translatejs2cpp('if(a){\n}\n//test\nelse{\n}', false)).toBe('if(a){\n}\nelse{\n//test\n}')
+
+    describe 'add void main if fullCode set true', ->
+      it 'if there is no patten need translate', ->
+        expect(utils.translatejs2cpp('hero.moveRight();')).toBe('void main() {\n    hero.moveRight();\n}')
+      it 'if there is var x or var y', ->
+        expect(utils.translatejs2cpp('var x = 2;\nvar y = 3;')).toBe('void main() {\n    float x = 2;\n    float y = 3;\n}')
+      it 'if there is ===/!==/and/or/not', ->
+        expect(utils.translatejs2cpp('a === 2 and b !== 1 or (not c)')).toBe('void main() {\n    a == 2 && b != 1 || (!c)\n}')
+      it 'if there is other var', ->
+        expect(utils.translatejs2cpp('var enemy = hero...')).toBe('void main() {\n    auto enemy = hero...\n}')
+      it 'if there is a function definition', ->
+        expect(utils.translatejs2cpp('function a() {}\n')).toBe('auto a() {}\nvoid main() {\n    \n}')
+      it 'if there is a function definition with parameter', ->
+        expect(utils.translatejs2cpp('function a(b) {}\n')).toBe('auto a(auto b) {}\nvoid main() {\n    \n}')
+      it 'if there is a function definition with parameters', ->
+        expect(utils.translatejs2cpp('function a(b, c) {}\na();')).toBe('auto a(auto b, auto c) {}\nvoid main() {\n    a();\n}')
+
+    describe 'if there are start comments', ->
+      it 'if there is no code', ->
+        expect(utils.translatejs2cpp('//abc\n//def\n')).toBe('//abc\n//def\nvoid main() {\n    \n}')
+      it 'if there is code without function definition', ->
+        expect(utils.translatejs2cpp('//abc\nhero.moveRight()')).toBe('//abc\nvoid main() {\n    hero.moveRight()\n}')
+      it 'if there is code with function definition', ->
+        expect(utils.translatejs2cpp('//abc\nfunction a(b, c) {}\nhero.moveRight()')).toBe('//abc\nauto a(auto b, auto c) {}\nvoid main() {\n    hero.moveRight()\n}')
+
   describe 'getQueryVariable(param, defaultValue)', ->
     beforeEach ->
       spyOn(utils, 'getDocumentSearchString').and.returnValue(
@@ -68,7 +107,7 @@ describe 'Utility library', ->
   describe 'inEU', ->
     it 'EU countries return true', ->
       euCountries = ['Austria', 'Belgium', 'Bulgaria', 'Croatia', 'Cyprus', 'Czech Republic', 'Denmark', 'Estonia', 'Finland', 'France', 'Germany', 'Greece', 'Hungary', 'Ireland', 'Italy', 'Latvia', 'Lithuania', 'Luxembourg', 'Malta', 'Netherlands', 'Poland', 'Portugal', 'Romania', 'Slovakia', 'Slovenia', 'Spain', 'Sweden', 'United Kingdom']
-      try 
+      try
         euCountries.forEach((c) -> expect(utils.inEU(c)).toEqual(true))
       catch err
         # NOTE: without try/catch, exceptions do not yield failed tests.
@@ -76,7 +115,7 @@ describe 'Utility library', ->
         expect(err).not.toBeDefined()
     it 'non-EU countries return false', ->
       nonEuCountries = ['united-states', 'peru', 'vietnam']
-      try 
+      try
         nonEuCountries.forEach((c) -> expect(utils.inEU(c)).toEqual(false))
       catch err
         expect(err).not.toBeDefined()
@@ -93,7 +132,7 @@ describe 'Utility library', ->
     it 'Slovakia is 16', ->
       expect(utils.ageOfConsent('slovakia')).toEqual(16)
     it 'default for EU countries 16', ->
-      expect(utils.ageOfConsent('bulgaria')).toEqual(16)
+      expect(utils.ageOfConsent('israel')).toEqual(16)
     it 'default for other countries is 0', ->
       expect(utils.ageOfConsent('hong-kong')).toEqual(0)
     it 'default for unknown countries is 0', ->

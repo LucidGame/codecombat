@@ -1,7 +1,7 @@
-extends /templates/base-flat
+extends /templates/base-flat.jade
 
 block content
-  .style-flat(data-spy="scroll", data-target="#nav-container")
+  div(data-spy="scroll", data-target="#nav-container")
     .container-fluid#jumbotron
       .container
         .row
@@ -22,9 +22,10 @@ block content
             li
               a(href="#team")#team-link
                 small.label(data-i18n="about.team_link")
-            li
-              a(href="#community")#community-link
-                small.label(data-i18n="nav.community")
+            if me.showOpenResourceLink()
+              li
+                a(href="#community")#community-link
+                  small.label(data-i18n="nav.community")
             li
               a(href="#story")#story-link
                 small.label(data-i18n="about.story_link")
@@ -53,8 +54,8 @@ block content
         ul
           // Full time
           li
-            a(href="http://www.nickwinter.net" rel="external")
-              .profile-pic
+            .profile-pic
+              a(href="http://www.nickwinter.net" rel="external")
                 img(src="/images/pages/about/team-avatars/nick-avatar.png").img-thumbnail.avatar
                 img(src="/images/pages/about/team-headshots/nick-headshot.png").img-thumbnail.headshot
             .team-bio
@@ -64,8 +65,8 @@ block content
               br
 
           li
-            a(href="http://www.mattlott.com/" rel="external")
-              .profile-pic
+            .profile-pic
+              a(href="http://www.mattlott.com/" rel="external")
                 img(src="/images/pages/about/team-avatars/matt-avatar.png").img-thumbnail.avatar
                 img(src="/images/pages/about/team-headshots/matt-headshot.png").img-thumbnail.headshot
             .team-bio
@@ -75,52 +76,14 @@ block content
               br
 
           li
-            a(href="http://cat.zdh.com/" rel="external")
-              .profile-pic
-                img(src="/images/pages/about/team-avatars/cat-avatar.png").img-thumbnail.avatar
-                img(src="/images/pages/about/team-headshots/cat-headshot.png").img-thumbnail.headshot
+            .profile-pic
+              a(href="http://bryukh.com" rel="external")
+                img(src="/images/pages/about/team-avatars/bryukh-avatar.png").img-thumbnail.avatar
+                img(src="/images/pages/about/team-headshots/bryukh-headshot.jpg").img-thumbnail.headshot
             .team-bio
               h6.label.team-name
-                a(href="http://cat.zdh.com/" rel="external") Catherine Weresow
-              small(data-i18n="about.cat_title")
-              br
-
-          li
-            .profile-pic
-              img(src="/images/pages/about/team-avatars/maka-avatar.png").img-thumbnail.avatar
-              img(src="/images/pages/about/team-headshots/maka-headshot.png").img-thumbnail.headshot
-            .team-bio
-              h6.label.team-name Michael 'Maka' Gradin
-              small(data-i18n="about.maka_title")
-              br
-
-          li
-            a(href="http://robinyang.com/" rel="external")
-              .profile-pic
-                img(src="/images/pages/about/team-avatars/robin-avatar.png").img-thumbnail.avatar
-                img(src="/images/pages/about/team-headshots/robin-headshot.png").img-thumbnail.headshot
-            .team-bio
-              h6.label.team-name
-                a(href="http://robinyang.com/" rel="external") Robin Yang
-              small(data-i18n="about.robin_title")
-              br
-
-          li
-            .profile-pic
-              img(src="/images/pages/about/team-avatars/nolan-avatar.png").img-thumbnail.avatar
-              img(src="/images/pages/about/team-headshots/nolan-headshot.png").img-thumbnail.headshot
-            .team-bio
-              h6.label.team-name Nolan Kelly
-              small(data-i18n="about.nolan_title")
-              br
-
-          li
-            .profile-pic
-              img(src="/images/pages/about/team-avatars/lisa-avatar.png").img-thumbnail.avatar
-              img(src="/images/pages/about/team-headshots/lisa-headshot.png").img-thumbnail.headshot
-            .team-bio
-              h6.label.team-name Lisa Wu
-              small(data-i18n="about.lisa_title")
+                a(href="http://bryukh.com" rel="external") Valentin Bryukhanov
+              small Senior Gameplay Developer
               br
 
           li
@@ -142,14 +105,14 @@ block content
               br
 
           li
-            a(href="https://www.linkedin.com/in/jane-park-90bb11b/" rel="external")
-              .profile-pic
+            .profile-pic
+              a(href="https://www.linkedin.com/in/jane-park-90bb11b/" rel="external")
                 img(src="/images/pages/about/team-avatars/jane-avatar.png").img-thumbnail.avatar
                 img(src="/images/pages/about/team-headshots/jane-headshot.png").img-thumbnail.headshot
             .team-bio
               h6.label.team-name
                 a(href="https://www.linkedin.com/in/jane-park-90bb11b/" rel="external") Jane Park
-              small(data-i18n="about.jane_title")
+              small Associate Product Manager
               br
 
           li
@@ -167,7 +130,7 @@ block content
               img(src="/images/pages/about/team-headshots/shubhangi-headshot.jpg").img-thumbnail.headshot
             .team-bio
               h6.label.team-name Shubhangi Gupta
-              small Software Engineer
+              small(data-i18n="about.shubhangi_title")
               br
 
           li
@@ -176,7 +139,7 @@ block content
               img(src="/images/pages/about/team-headshots/robarev-headshot.jpg").img-thumbnail.headshot
             .team-bio
               h6.label.team-name Rob Arevalo
-              small Partnership Manager
+              small Account Executive
               br
 
           li
@@ -185,69 +148,270 @@ block content
               img(src="/images/pages/about/team-headshots/lawrence-headshot.jpg").img-thumbnail.headshot
             .team-bio
               h6.label.team-name Lawrence Kotovets
-              small Partnership Manager
+              small(data-i18n="about.lawrence_title")
               br
 
           li
             .profile-pic
-              img(src="/images/pages/about/team-avatars/vicki-avatar.png").img-thumbnail.avatar
-              img(src="/images/pages/about/team-headshots/vicki-headshot.jpg").img-thumbnail.headshot
-            .team-bio
-              h6.label.team-name Vicki Lang
-              small Education Strategy Lead
-              br
-              
-          li
-            .profile-pic
-              img(src="/images/pages/about/team-headshots/chethana-headshot.png").img-thumbnail.avatar
-              img(src="/images/pages/about/team-headshots/chethana-headshot.png").img-thumbnail.headshot
-            .team-bio
-              h6.label.team-name Chethana Sastry
-              small Senior Software Engineer
-              br
-
-          li
-            a(href="https://www.linkedin.com/in/stephanie-rockett-phd-b63a0464/" rel="external")
-              .profile-pic
-                img(src="/images/pages/about/team-headshots/stephanie-headshot.png").img-thumbnail.avatar
+              a(href="https://www.linkedin.com/in/stephanie-rockett-phd-b63a0464/" rel="external")
+                img(src="/images/pages/about/team-avatars/stephanie-avatar.png").img-thumbnail.avatar
                 img(src="/images/pages/about/team-headshots/stephanie-headshot.png").img-thumbnail.headshot
             .team-bio
               h6.label.team-name
                 a(href="https://www.linkedin.com/in/stephanie-rockett-phd-b63a0464/" rel="external") Stephanie Rockett
-              small Customer Support Specialist
+              small(data-i18n="about.stephanie_title")
               br
 
           li
-            a(href="https://andrewjakubowicz.github.io/" rel="external")
-              .profile-pic
-                img(src="/images/pages/about/team-headshots/andrew-headshot.png").img-thumbnail.avatar
+            .profile-pic
+              a(href="https://andrewjakubowicz.me" rel="external")
+                img(src="/images/pages/about/team-avatars/andrew-avatar.png").img-thumbnail.avatar
                 img(src="/images/pages/about/team-headshots/andrew-headshot.png").img-thumbnail.headshot
             .team-bio
               h6.label.team-name
-                a(href="https://andrewjakubowicz.github.io/" rel="external") Andrew Jakubowicz
-              small Software Engineer
+                a(href="https://andrewjakubowicz.me" rel="external") Andrew Jakubowicz
+              small(data-i18n="about.andrew_title")
               br
 
-        ul
-          // Part time / contract
           li
-            a(href="http://bryukh.com" rel="external")
-              img(src="/images/pages/about/bryukh_small.png").img-thumbnail
+            .profile-pic
+              a(href="http://www.magicalunderworld.com/" rel="external")
+                img(src="/images/pages/about/team-avatars/brian-avatar.png").img-thumbnail.avatar
+                img(src="/images/pages/about/team-headshots/brian-headshot.png").img-thumbnail.headshot
             .team-bio
               h6.label.team-name
-                a(href="http://bryukh.com" rel="external") Valentin Bryukhanov
-              small(data-i18n="about.bryukh_title")
-              small(data-i18n="about.bryukh_blurb")
+                a(href="http://www.magicalunderworld.com/" rel="external") Brian Freyermuth
+              small(data-i18n="about.brian_title")
+              br
 
           li
-            a(href="http://danielalao.com" rel="external")
-              img(src="/images/pages/about/daniela_small.png").img-thumbnail
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/bobby-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/bobby-headshot.png").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Bobby Lockhart
+              small(data-i18n="about.bobby_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/claire-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/claire-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Claire Armstrong
+              small(data-i18n="about.claire_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/chelsea-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/chelsea-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Chelsea Johnson
+              small Senior Operations Manager
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/daniela-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/daniela-headshot.jpg").img-thumbnail.headshot
             .team-bio
               h6.label.team-name
                 a(href="http://danielalao.com" rel="external") Daniela Lao
               small(data-i18n="about.daniela_title")
-              small(data-i18n="about.daniela_blurb")
+              br
 
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/shasha-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/shasha-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name
+                a(href="http://www.shashaxdu.com/" rel="external") Shasha Du
+              small(data-i18n="about.shasha_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/bill-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/bill-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Bill Wang
+              small(data-i18n="about.bill_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/shan-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/shan-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Shan Liu
+              small(data-i18n="about.shan_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/run-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/run-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Run Chen
+              small(data-i18n="about.run_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/maya-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/maya-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Maya McCoy
+              small(data-i18n="about.maya_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/matias-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/matias-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Matias Forbord
+              small(data-i18n="about.matias_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/ryan-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/ryan-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Ryan Bousquet
+              small(data-i18n="about.ryan_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/jonathan-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/jonathan-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Jonathan Timmmons
+              small Director of Inside Sales
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-headshots/yuqiang-headshot.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/yuqiang-headshot.png").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Yuqiang Tong
+              small(data-i18n="about.yuqiang_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-headshots/zhiran-headshot.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/zhiran-headshot.png").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Zhiran Chen
+              small(data-i18n="about.zhiran_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-headshots/lance-headshot.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/lance-headshot.png").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Lance Wu
+              small(data-i18n="about.lance_title")
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/ashley-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/ashley-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Ashley Stoddard
+              small Senior Artist
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/lizb-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/lizb-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Liz Bush
+              small Sales Development Representative
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/emilia-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/emilia-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Emilia Pasquetti
+              small Senior Account Executive
+              br
+
+          li
+            .profile-pic
+              img(src="/images/pages/about/team-avatars/becky-avatar.png").img-thumbnail.avatar
+              img(src="/images/pages/about/team-headshots/becky-headshot.jpg").img-thumbnail.headshot
+            .team-bio
+              h6.label.team-name Becky Haghighi
+              small Senior Account Executive
+              br
+
+          //- li
+          //-   .profile-pic
+          //-     img(src="/images/pages/about/team-avatars/heather-avatar.png").img-thumbnail.avatar
+          //-     img(src="/images/pages/about/team-headshots/heather-headshot.jpg").img-thumbnail.headshot
+          //-   .team-bio
+          //-     h6.label.team-name Heather Fish
+          //-     small Sales Development Representative
+          //-     br
+
+          //- li
+          //-   .profile-pic
+          //-     img(src="/images/pages/about/team-avatars/steven-avatar.png").img-thumbnail.avatar
+          //-     img(src="/images/pages/about/team-headshots/steven-headshot.jpg").img-thumbnail.headshot
+          //-   .team-bio
+          //-     h6.label.team-name Steven Adkins
+          //-     small Sales Development Representative
+          //-     br
+
+          //- li
+          //-   .profile-pic
+          //-     img(src="/images/pages/about/team-avatars/lynn-avatar.png").img-thumbnail.avatar
+          //-     img(src="/images/pages/about/team-headshots/lynn-headshot.jpg").img-thumbnail.headshot
+          //-   .team-bio
+          //-     h6.label.team-name Lynn Owens
+          //-     small Sales Development Representative
+          //-     br
+
+          //- li
+          //-   .profile-pic
+          //-     img(src="/images/pages/about/team-avatars/brandon-avatar.png").img-thumbnail.avatar
+          //-     img(src="/images/pages/about/team-headshots/brandon-headshot.jpg").img-thumbnail.headshot
+          //-   .team-bio
+          //-     h6.label.team-name Brandon Esse
+          //-     small Account Executive
+          //-     br
+
+          //- li
+          //-   .profile-pic
+          //-     img(src="/images/pages/about/team-avatars/shannon-avatar.png").img-thumbnail.avatar
+          //-     img(src="/images/pages/about/team-headshots/shannon-headshot.jpg").img-thumbnail.headshot
+          //-   .team-bio
+          //-     h6.label.team-name Shannon Alves
+          //-     small Senior Account Executive
+          //-     br
+
+          //- li
+          //-   .profile-pic
+          //-     img(src="/images/pages/about/team-avatars/juan-avatar.png").img-thumbnail.avatar
+          //-     img(src="/images/pages/about/team-headshots/juan-headshot.jpg").img-thumbnail.headshot
+          //-   .team-bio
+          //-     h6.label.team-name Juan Benitez
+          //-     small Account Executive
+          //-     br
+
+        ul
           li
             a(href="http://retrostylegames.com/" rel="external")
               img(src="/images/pages/about/pavel_small.png").img-thumbnail
@@ -266,29 +430,30 @@ block content
               small(data-i18n="about.retrostyle_title")
               small(data-i18n="about.retrostyle_blurb")
 
-      #community.anchor
-        #community-row-1.row.text-center
-          .col-sm-12
-          .text-center
-            h3(data-i18n="about.community_title")
-            h4(data-i18n="about.community_subtitle")
-            img(src="/images/pages/about/github_avatars.png")#community-avatars
+      if me.showOpenResourceLink()
+        #community.anchor
+          #community-row-1.row.text-center
+            .col-sm-12
+            .text-center
+              h3(data-i18n="about.community_title")
+              h4(data-i18n="about.community_subtitle")
+              img(src="/images/pages/about/github_avatars.png")#community-avatars
 
-        #community-row-2.row
-          .col-sm-5
-            p.responsive-side-margins
-              span.spr(data-i18n="about.community_description_3")
-              a(href="/community")
-                span(data-i18n="about.community_description_link_2")
-              span , 
-              span.spr(data-i18n="about.community_description_1")
-              a(href="/contribute")
-                span(data-i18n="about.community_description_link")
-              span.spl(data-i18n="about.community_description_2")
-          .col-sm-6.col-sm-offset-1#community-graphic.responsive-side-margins
-            h2(data-i18n="about.number_contributors")
-            img(src="/images/pages/about/github.png")
-            #community-graphic-filler
+          #community-row-2.row
+            .col-sm-5
+              p.responsive-side-margins
+                span.spr(data-i18n="about.community_description_3")
+                a(href="/community")
+                  span(data-i18n="about.community_description_link_2")
+                span ,
+                span.spr(data-i18n="about.community_description_1")
+                a(href="/contribute")
+                  span(data-i18n="about.community_description_link")
+                span.spl(data-i18n="about.community_description_2")
+            .col-sm-6.col-sm-offset-1#community-graphic.responsive-side-margins
+              h2(data-i18n="about.number_contributors")
+              img(src="/images/pages/about/github.png")
+              #community-graphic-filler
 
       #story.anchor
         .text-center
@@ -357,25 +522,33 @@ block content
                 li.small(data-i18n="about.jobs_benefit_11")
                 li.small(data-i18n="about.jobs_benefit_4")
                 li.small(data-i18n="about.jobs_benefit_5")
-                li.small(data-i18n="about.jobs_benefit_7")
-          .col-sm-6.col-md-5.col-lg-4
-            .job-listing
-               h5 Senior Game Designer
-                 .text-center
-                   small.label
-                     | San Francisco • Full-time
-                 p.small Build engaging learning experiences for students by leveraging your game design expertise!
-                 a.job-link.btn.btn-lg.btn-navy(href="https://jobs.lever.co/codecombat/71c98d09-35ba-4b0b-afd2-f0105762dd2f?lever-origin=applied&lever-source%5B%5D=CodeCombat" rel="external")
-                  span(data-i18n="about.learn_more")
-          //-     h5 (No Open Roles)
-          //-     p.small Check back later for updates on new positions at CodeCombat.
 
+          .col-sm-6.col-md-5.col-md-offset-1.col-lg-4.col-lg-offset-0
+            .job-listing
+              h5 Game Development Engineer
+                .text-center
+                  small.label
+                    | China / Remote • Full-time
+                p.small CodeCombat is looking for a Game Development Engineer to join our game-based education startup. If you have experience building games and programming, we want to hear from you!
+                a.job-link.btn.btn-lg.btn-navy(href="https://jobs.lever.co/codecombat/10f7af72-7c70-4ed6-96de-9281281be952?lever-origin=applied&lever-source%5B%5D=CodeCombat" rel="external" target="_blank")
+                  span(data-i18n="about.learn_more")
+
+          //.col-sm-6.col-md-5.col-lg-4
+          //  .job-listing
+          //    h5 (No Open Roles)
+          //    p.small Check back later for updates on new positions at CodeCombat.
 
       #contact.anchor
         .text-center
           h3(data-i18n="about.contact_title")
           h4(data-i18n="about.contact_subtitle")
-          a(href="mailto:team@codecombat.com") team@codecombat.com
+          if me.showChinaResourceInfo()
+            - var {COCO_CHINA_CONST} = require('core/constants')
+            p.
+              商务合作：#{COCO_CHINA_CONST.CONTACT_EMAIL} #[br]
+              业务咨询：#{COCO_CHINA_CONST.CONTACT_PHONE}
+          else
+            a(href="mailto:team@codecombat.com") team@codecombat.com
 
       #files
         .row

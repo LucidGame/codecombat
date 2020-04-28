@@ -76,9 +76,13 @@ setupExpressMiddleware = (app) ->
   if config.proxy
     # Don't proxy static files with sha prefixes, redirect them
     regex = /\/[0-9a-f]{40}\/.*/
+    regex2 = /\/[0-9a-f]{40}-[0-9a-f]{40}\/.*/
     app.use (req, res, next) ->
       if regex.test(req.path)
         newPath = req.path.slice(41)
+        return res.redirect(newPath)
+      if regex2.test(req.path)
+        newPath = req.path.slice(82)
         return res.redirect(newPath)
       next()
 
@@ -286,8 +290,10 @@ setupQuickBailToMainHTML = (app) ->
 
       if req.headers.host is 'cp.codecombat.com'
         features.codePlay = true # for one-off changes. If they're shared across different scenarios, refactor
-      if /cn\.codecombat\.com/.test(req.get('host'))
+      if /cn\.codecombat\.com/.test(req.get('host')) or /koudashijie\.com/.test(req.get('host'))
         features.china = true
+        if template is 'home.html'
+          template = 'home-cn.html'
 
       if config.chinaInfra
         features.chinaInfra = true
@@ -325,9 +331,18 @@ setupProxyMiddleware = (app) ->
   return if config.isProduction
   return unless config.proxy
   httpProxy = require 'http-proxy'
+
+  target = 'https://very.direct.codecombat.com'
+  headers = {}
+
+  if (process.env.COCO_PROXY_NEXT)
+    target = 'https://next.codecombat.com'
+    headers['Host'] = 'next.codecombat.com'
+
   proxy = httpProxy.createProxyServer({
-    target: 'https://very.direct.codecombat.com'
-    secure: false
+    target: target
+    secure: false,
+    headers: headers
   })
   log.info 'Using dev proxy server'
   app.use (req, res, next) ->

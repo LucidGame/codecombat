@@ -34,8 +34,8 @@ describe 'CreateTeacherAccountView', ->
     organization: 'School'
     district: 'District'
     city: 'Springfield'
-    state: 'AA'
-    country: 'asdf'
+    state: 'AL'
+    country: 'United States'
     numStudents: '1-10'
     numStudentsTotal: '1-500'
     educationLevel: ['Middle']
@@ -88,7 +88,7 @@ describe 'CreateTeacherAccountView', ->
       AuthModal = require 'views/core/AuthModal'
       expect(view.openModalView.calls.argsFor(0)[0] instanceof AuthModal).toBe(true)
 
-  if !window.features.chinaInfra
+  if !window.features.chinaUx
     describe 'clicking the Facebook button', ->
 
       beforeEach ->
@@ -155,14 +155,14 @@ describe 'CreateTeacherAccountView', ->
                 expect(_.isEqual(expected, actual)).toBe(true)
                 done()
 
-  if !window.features.chinaInfra
+  if !window.features.chinaUx
     describe 'clicking the G+ button', ->
 
       beforeEach ->
         application.gplusHandler.fakeAPI()
         view.$('#gplus-signup-btn').click()
         request = jasmine.Ajax.requests.mostRecent()
-        expect(request.url).toBe('/db/user?gplusID=abcd&gplusAccessToken=1234')
+        expect(request.url).toBe('/db/user?gplusID=abcd&gplusAccessToken=1234&email=some%40email.com')
         expect(request.method).toBe('GET')
 
       describe 'when an associated user already exists', ->

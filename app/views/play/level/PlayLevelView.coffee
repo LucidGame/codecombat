@@ -21,6 +21,7 @@ LevelSession = require 'models/LevelSession'
 Level = require 'models/Level'
 LevelComponent = require 'models/LevelComponent'
 Article = require 'models/Article'
+Mandate = require 'models/Mandate'
 Camera = require 'lib/surface/Camera'
 AudioPlayer = require 'lib/AudioPlayer'
 Simulator = require 'lib/simulator/Simulator'
@@ -45,10 +46,12 @@ VictoryModal = require './modal/VictoryModal'
 HeroVictoryModal = require './modal/HeroVictoryModal'
 CourseVictoryModal = require './modal/CourseVictoryModal'
 PicoCTFVictoryModal = require './modal/PicoCTFVictoryModal'
+HoC2018VictoryModal = require 'views/special_event/HoC2018VictoryModal'
 InfiniteLoopModal = require './modal/InfiniteLoopModal'
 LevelSetupManager = require 'lib/LevelSetupManager'
 ContactModal = require 'views/core/ContactModal'
 HintsView = require './HintsView'
+SurfaceContextMenuView = require './SurfaceContextMenuView'
 HintsState = require './HintsState'
 WebSurfaceView = require './WebSurfaceView'
 SpellPaletteView = require './tome/SpellPaletteView'
@@ -58,6 +61,14 @@ require 'lib/game-libraries'
 window.Box2D = require('exports-loader?Box2D!vendor/scripts/Box2dWeb-2.1.a.3')
 
 PROFILE_ME = false
+
+STOP_CHECK_TOURNAMENT_CLOSE = 0  # tournament ended
+KEEP_CHECK_TOURNAMENT_CLOSE = 1  # tournament not begin
+STOP_CHECK_TOURNAMENT_OPEN = 2  # none tournament only level
+KEEP_CHECK_TOURNAMENT_OPEN = 3  # tournament running
+
+TOURNAMENT_OPEN = [2, 3]
+STOP_CHECK_TOURNAMENT = [0, 2]
 
 module.exports = class PlayLevelView extends RootView
   id: 'level-view'
@@ -100,12 +111,17 @@ module.exports = class PlayLevelView extends RootView
     'click #stop-cinematic-playback-button': -> Backbone.Mediator.publish 'playback:stop-cinematic-playback', {}
     'click #fullscreen-editor-background-screen': (e) -> Backbone.Mediator.publish 'tome:toggle-maximize', {}
     'click .contact-link': 'onContactClicked'
+    'contextmenu #webgl-surface': 'onSurfaceContextMenu'
     'click': 'onClick'
 
   onClick: ->
     # workaround to get users out of permanent idle status
     if application.userIsIdle
       application.idleTracker.onVisible()
+
+    #hide context menu if visible
+    if @$('#surface-context-menu-view').is(":visible")
+      Backbone.Mediator.publish 'level:surface-context-menu-hide', {}
 
   shortcuts:
     'ctrl+s': 'onCtrlS'
@@ -140,12 +156,25 @@ module.exports = class PlayLevelView extends RootView
       @load()
       application.tracker?.trackEvent 'Started Level Load', category: 'Play Level', level: @levelID, label: @levelID unless @observing
 
+    @calcTimeOffset()
+    @mandate = @supermodel.loadModel(new Mandate()).model
+
+    if features.china
+      @checkTournamentEndInterval = setInterval @checkTournamentEnd.bind(@), 3000
+
+  getMeta: ->
+    link: [
+      { vmid: 'rel-canonical', rel: 'canonical', content: '/play' }
+    ]
+
   setLevel: (@level, givenSupermodel) ->
     @supermodel.models = givenSupermodel.models
     @supermodel.collections = givenSupermodel.collections
     @supermodel.shouldSaveBackups = givenSupermodel.shouldSaveBackups
 
     serializedLevel = @level.serialize {@supermodel, @session, @otherSession, headless: false, sessionless: false}
+    if me.constrainHeroHealth()
+      serializedLevel.constrainHeroHealth = true
     @god?.setLevel serializedLevel
     if @world
       @world.loadFromLevel serializedLevel, false
@@ -170,7 +199,9 @@ module.exports = class PlayLevelView extends RootView
       not e.level.isType('course-ladder')
 
       # TODO: Add a general way for standalone levels to be accessed by students, teachers
-      e.level.get('slug') isnt 'peasants-and-munchkins'
+      e.level.get('slug') not in ['peasants-and-munchkins',
+                                  'game-dev-2-tournament-project',
+                                  'game-dev-3-tournament-project']
     ])
       return _.defer -> application.router.redirectHome()
 
@@ -180,6 +211,47 @@ module.exports = class PlayLevelView extends RootView
         indefiniteLength: e.level.isType('game-dev')
       })
     @setupGod() if @waitingToSetUpGod
+    @levelSlug = e.level.get('slug')
+
+  checkTournamentEnd: ->
+    return unless @timeOffset
+    return unless @mandate.loaded
+    return unless @levelSlug
+    courseInstanceID = @courseInstanceID or utils.getQueryVariable 'league'
+    mandate = @mandate.get('0')
+
+    tournamentState = STOP_CHECK_TOURNAMENT_OPEN
+    if mandate
+      tournamentState = @getTournamentState mandate, courseInstanceID, @levelSlug, @timeOffset
+      unless me.isAdmin() or tournamentState in TOURNAMENT_OPEN
+        window.location.href = '/play/ladder/'+@levelSlug+(if courseInstanceID then '/course/'+courseInstanceID else "")
+    if tournamentState in STOP_CHECK_TOURNAMENT
+      clearInterval @checkTournamentEndInterval
+
+  getTournamentState: (mandate, courseInstanceID, levelSlug, timeOffset) ->
+    tournament = _.find mandate.currentTournament or [], (t) ->
+      t.courseInstanceID is courseInstanceID and t.level is levelSlug
+    if tournament
+      currentTime = (Date.now() + timeOffset) / 1000
+      console.log "Current time:", new Date(currentTime * 1000)
+      if currentTime < tournament.startAt
+        delta = tournament.startAt - currentTime
+        console.log "Tournament will start at: #{new Date(tournament.startAt * 1000)}, Time left: #{parseInt(delta / 60 / 60) }:#{parseInt(delta / 60) % 60}:#{parseInt(delta) % 60}"
+        return KEEP_CHECK_TOURNAMENT_CLOSE
+      else if currentTime > tournament.endAt
+        console.log "Tournament ended at: #{new Date(tournament.endAt * 1000)}"
+        return STOP_CHECK_TOURNAMENT_CLOSE
+      delta = tournament.endAt - currentTime
+      console.log "Tournament will end at: #{new Date(tournament.endAt * 1000)}, Time left: #{parseInt(delta / 60 / 60) }:#{parseInt(delta / 60) % 60}:#{parseInt(delta) % 60}"
+      return KEEP_CHECK_TOURNAMENT_OPEN
+    else
+      return if levelSlug in (mandate.tournamentOnlyLevels or []) then STOP_CHECK_TOURNAMENT_CLOSE else STOP_CHECK_TOURNAMENT_OPEN
+
+  calcTimeOffset: ->
+    $.ajax
+      type: 'HEAD'
+      success: (result, status, xhr) =>
+        @timeOffset = new Date(xhr.getResponseHeader("Date")).getTime() - Date.now()
 
   trackLevelLoadEnd: ->
     return if @isEditorPreview
@@ -226,6 +298,11 @@ module.exports = class PlayLevelView extends RootView
     console.debug('PlayLevelView: world necessities loaded')
     # Called when we have enough to build the world, but not everything is loaded
     @grabLevelLoaderData()
+
+    @setMeta({
+      title: $.i18n.t('play.level_title', { level: @level.get('name') })
+    })
+
     randomTeam = @world?.teamForPlayer()  # If no team is set, then we will want to equally distribute players to teams
     team = utils.getQueryVariable('team') ?  @session.get('team') ? randomTeam ? 'humans'
     @loadOpponentTeam(team)
@@ -296,7 +373,10 @@ module.exports = class PlayLevelView extends RootView
     return if @level.isType('web-dev')
     return @waitingToSetUpGod = true unless @god
     @waitingToSetUpGod = undefined
-    @god.setLevel @level.serialize {@supermodel, @session, @otherSession, headless: false, sessionless: false}
+    serializedLevel = @level.serialize {@supermodel, @session, @otherSession, headless: false, sessionless: false}
+    if me.constrainHeroHealth()
+      serializedLevel.constrainHeroHealth = true
+    @god.setLevel serializedLevel
     @god.setLevelSessionIDs if @otherSession then [@session.id, @otherSession.id] else [@session.id]
     @god.setWorldClassMap @world.classMap
 
@@ -310,6 +390,14 @@ module.exports = class PlayLevelView extends RootView
 
   initGoalManager: ->
     options = {}
+
+    # Add two lines to handle `void main() {}` in C++ for the linesOfCode goal.
+    if ((@session?.get('codeLanguage') is 'cpp' or me.get('aceConfig')?.language is 'cpp') and Array.isArray(@level.get('goals')))
+      @level.get('goals').forEach((goal) =>
+        if goal?.linesOfCode?.humans and typeof goal.linesOfCode.humans == 'number'
+          goal.linesOfCode.humans += 2
+      )
+
     if @level.get('assessment') is 'cumulative'
       options.minGoalsToComplete = 1
     @goalManager = new GoalManager(@world, @level.get('goals'), @team, options)
@@ -344,6 +432,7 @@ module.exports = class PlayLevelView extends RootView
     @insertSubView new LevelDialogueView {level: @level, sessionID: @session.id}
     @insertSubView new ChatView levelID: @levelID, sessionID: @session.id, session: @session
     @insertSubView new ProblemAlertView session: @session, level: @level, supermodel: @supermodel
+    @insertSubView new SurfaceContextMenuView session: @session, level: @level
     @insertSubView new DuelStatsView level: @level, session: @session, otherSession: @otherSession, supermodel: @supermodel, thangs: @world.thangs, showsGold: goldInDuelStatsView if @level.isType('hero-ladder', 'course-ladder')
     @insertSubView @controlBar = new ControlBarView {worldName: utils.i18n(@level.attributes, 'name'), session: @session, level: @level, supermodel: @supermodel, courseID: @courseID, courseInstanceID: @courseInstanceID}
     @insertSubView @hintsView = new HintsView({ @session, @level, @hintsState }), @$('.hints-view')
@@ -499,7 +588,7 @@ module.exports = class PlayLevelView extends RootView
 
   perhapsStartSimulating: ->
     return unless @shouldSimulate()
-    languagesToLoad = ['javascript', 'python', 'coffeescript', 'lua']  # java
+    languagesToLoad = ['javascript', 'python', 'coffeescript', 'lua']  # java, cpp
     for language in languagesToLoad
       do (language) =>
         loadAetherLanguage(language).then (aetherLang) =>
@@ -633,16 +722,30 @@ module.exports = class PlayLevelView extends RootView
   showVictory: (options={}) ->
     return if @level.hasLocalChanges()  # Don't award achievements when beating level changed in level editor
     return if @level.isType('game-dev') and @level.get('shareable') and not options.manual
+    return if @showVictoryHandlingInProgress
+    @showVictoryHandlingInProgress=true
     @endHighlight()
-    options = {level: @level, supermodel: @supermodel, session: @session, hasReceivedMemoryWarning: @hasReceivedMemoryWarning, courseID: @courseID, courseInstanceID: @courseInstanceID, world: @world}
+    options = {level: @level, supermodel: @supermodel, session: @session, hasReceivedMemoryWarning: @hasReceivedMemoryWarning, courseID: @courseID, courseInstanceID: @courseInstanceID, world: @world, parent: @}
     ModalClass = if @level.isType('hero', 'hero-ladder', 'hero-coop', 'course', 'course-ladder', 'game-dev', 'web-dev') then HeroVictoryModal else VictoryModal
     ModalClass = CourseVictoryModal if @isCourseMode() or me.isSessionless()
     if @level.isType('course-ladder')
       ModalClass = CourseVictoryModal
       options.courseInstanceID = utils.getQueryVariable('course-instance') or utils.getQueryVariable('league')
     ModalClass = PicoCTFVictoryModal if window.serverConfig.picoCTF
+    if @level.get("slug") is "code-play-share" and @level.get('shareable')
+      hocModal = new HoC2018VictoryModal({
+        shareURL: "#{window.location.origin}/play/#{@level.get('type')}-level/#{@session.id}",
+        campaign: @level.get("campaign")
+      })
+      @openModalView(hocModal)
+      hocModal.once "hidden", =>
+        @showVictoryHandlingInProgress = false
+      return
     victoryModal = new ModalClass(options)
     @openModalView(victoryModal)
+    victoryModal.once 'hidden', =>
+      @showVictoryHandlingInProgress=false
+
     if me.get('anonymous')
       window.nextURL = '/play/' + (@level.get('campaign') ? '')  # Signup will go here on completion instead of reloading.
 
@@ -681,6 +784,15 @@ module.exports = class PlayLevelView extends RootView
     $.ajax '/file', type: 'POST', data: body, success: (e) ->
       contactModal.updateScreenshot?()
 
+  onSurfaceContextMenu: (e) ->
+    e?.preventDefault?()
+    return if @$el.hasClass 'real-time'
+    return unless @surface.showCoordinates and ( navigator.clipboard or document.queryCommandSupported('copy') )
+    pos = x: e.clientX, y: e.clientY
+    wop = @surface.coordinateDisplay.lastPos
+    Backbone.Mediator.publish 'level:surface-context-menu-pressed', posX: pos.x, posY: pos.y, wopX: wop.x, wopY: wop.y
+
+
   # Dynamic sound loading
 
   onNewWorld: (e) ->
@@ -693,6 +805,7 @@ module.exports = class PlayLevelView extends RootView
     if @world.age > 0 and @willUpdateStudentGoals
       @willUpdateStudentGoals = false
       @updateStudentGoals()
+      @updateLevelName()
 
     @world.scripts = scripts
     thangTypes = @supermodel.getModels(ThangType)
@@ -717,15 +830,23 @@ module.exports = class PlayLevelView extends RootView
     @$el.addClass('real-time').focus()
     @willUpdateStudentGoals = true
     @updateStudentGoals()
+    @updateLevelName()
     @onWindowResize()
     @realTimePlaybackWaitingForFrames = true
 
   updateStudentGoals: ->
     return unless @level.isType('game-dev')
-    @studentGoals = @world.thangMap['Hero Placeholder'].stringGoals
-    @studentGoals = @studentGoals?.map((g) -> JSON.parse(g))
+    # Set by users. Defined in `game.GameUI` component in the level editor.
+    if @world.uiText?.directions?.length
+      @studentGoals = @world.uiText.directions.map((direction) -> {type: "user_defined", direction})
+    else
+      @studentGoals = @world.thangMap['Hero Placeholder'].stringGoals?.map((g) -> JSON.parse(g))
     @renderSelectors('#how-to-play-game-dev-panel')
     @$('#how-to-play-game-dev-panel').removeClass('hide')
+
+  updateLevelName: () ->
+    if @world.uiText?.levelName
+      @controlBar.setLevelName(@world.uiText.levelName)
 
   onRealTimePlaybackEnded: (e) ->
     return unless @$el.hasClass 'real-time'
@@ -777,6 +898,8 @@ module.exports = class PlayLevelView extends RootView
     #@instance.save() unless @instance.loading
     delete window.nextURL
     console.profileEnd?() if PROFILE_ME
+    if @checkTournamentEndInterval
+      clearInterval @checkTournamentEndInterval
     super()
 
   onIPadMemoryWarning: (e) ->

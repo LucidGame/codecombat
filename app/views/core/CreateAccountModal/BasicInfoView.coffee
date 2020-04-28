@@ -6,6 +6,7 @@ forms = require 'core/forms'
 errors = require 'core/errors'
 User = require 'models/User'
 State = require 'models/State'
+store = require 'core/store'
 
 ###
 This view handles the primary form for user details — name, email, password, etc,
@@ -178,9 +179,11 @@ module.exports = class BasicInfoView extends CocoView
       email: User.schema.properties.email
       name: User.schema.properties.name
       password: User.schema.properties.password
+      firstName: User.schema.properties.firstName
+      lastName: User.schema.properties.lastName
     required: switch @signupState.get('path')
-      when 'student' then ['name', 'password', 'firstName', 'lastName']
-      when 'teacher' then ['password', 'email', 'firstName', 'lastName']
+      when 'student' then ['name', 'password', 'firstName'].concat(if me.showChinaRegistration() then [] else ['lastName'])
+      when 'teacher' then ['password', 'email', 'firstName'].concat(if me.showChinaRegistration() then [] else ['lastName'])
       else ['name', 'password', 'email']
 
   onClickBackButton: ->
@@ -241,7 +244,9 @@ module.exports = class BasicInfoView extends CocoView
 
       return new Promise(jqxhr.then)
 
-    .then =>
+    .then (newUser) =>
+      # More data will be added by the server so make sure to trigger an identify call after page reload
+      window.application.tracker.identifyAfterNextPageLoad()
 
       # Don't sign up, kick to TeacherComponent instead
       if @signupState.get('path') is 'teacher'
@@ -252,7 +257,11 @@ module.exports = class BasicInfoView extends CocoView
         return
 
       # Use signup method
-      window.tracker?.identify() unless User.isSmokeTestUser({ email: @signupState.get('signupForm').email })
+      unless User.isSmokeTestUser({ email: @signupState.get('signupForm').email })
+        # Set new user data and call initial identify
+        store.dispatch('me/authenticated', newUser)
+        window.application.tracker.identify()
+
       switch @signupState.get('ssoUsed')
         when 'gplus'
           { email, gplusID } = @signupState.get('ssoAttrs')
@@ -269,6 +278,27 @@ module.exports = class BasicInfoView extends CocoView
       return new Promise(jqxhr.then)
 
     .then =>
+      trackerCalls = []
+
+      loginMethod = 'CodeCombat'
+      if @signupState.get('ssoUsed') is'gplus'
+        loginMethod = 'GPlus'
+        trackerCalls.push(
+          window.tracker?.trackEvent 'Google Login', category: "Signup", label: 'GPlus'
+        )
+      else if @signupState.get('ssoUsed') is 'facebook'
+        loginMethod = 'Facebook'
+        trackerCalls.push(
+          window.tracker?.trackEvent 'Facebook Login', category: "Signup", label: 'Facebook'
+        )
+
+      trackerCalls.push(
+        window.application.tracker?.trackEvent 'Finished Signup', category: "Signup", label: loginMethod
+      )
+
+      return Promise.all(trackerCalls)
+
+    .then =>
       { classCode, classroom } = @signupState.attributes
       if classCode and classroom
         return new Promise(classroom.joinWithCode(classCode).then)
@@ -283,6 +313,10 @@ module.exports = class BasicInfoView extends CocoView
       else
         console.error 'BasicInfoView form submission Promise error:', e
         @state.set('error', e.responseJSON?.message or 'Unknown Error')
+        # Adding event to detect if the error occurs in prod since it is not reproducible (https://app.asana.com/0/654820789891907/1113232508815667)
+        # TODO: Remove when not required.
+        if @id == 'single-sign-on-confirm-view' and @signupState.get('path') is 'teacher'
+          window.tracker?.trackEvent 'Error in ssoConfirmView', {category: 'Teachers', label: @state.get('error')}
 
   finishSignup: ->
     if @signupState.get('path') is 'teacher'

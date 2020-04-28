@@ -46,6 +46,7 @@ module.exports =
   'mi': { nativeDescription: 'te reo Māori', englishDescription: 'Māori' }
   'mk-MK': { nativeDescription: 'Македонски', englishDescription: 'Macedonian' }
   'hi': { nativeDescription: 'मानक हिन्दी', englishDescription: 'Hindi' }
+  'mn': { nativeDescription: 'Монгол хэл', englishDescription: 'Mongolian' }
   'ms': { nativeDescription: 'Bahasa Melayu', englishDescription: 'Bahasa Malaysia' }
   'my': { nativeDescription: 'မြန်မာစကား', englishDescription: 'Myanmar language' }
   'nl': { nativeDescription: 'Nederlands', englishDescription: 'Dutch' }
@@ -75,7 +76,10 @@ Object.defineProperties module.exports,
   load:
     enumerable: false
     value: (langCode) ->
-      return Promise.resolve() if langCode in ['en', 'en-US']
+      if langCode in ['en', 'en-US']
+        @storeLoadedLanguage(langCode, module.exports[langCode])
+        return Promise.resolve()
+
       console.log "Loading locale:", langCode
       promises = [
         new Promise (accept, reject) ->

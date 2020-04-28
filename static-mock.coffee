@@ -11,13 +11,15 @@ exports.features =
   playViewsOnly: false
 
 exports.me =
+  showingStaticPagesWhileLoading: () -> true
   isStudent: () -> false
   isAnonymous: () -> @get('anonymous')
   hasSubscription: () -> false
   isTeacher: () -> false
   isAdmin: () -> false
   level: () -> 1
-  onChinaInfra: -> false
+  useDexecure: -> true
+  useSocialSignOn: -> true
   gems: () -> 0
   getPhotoURL: () -> ''
   displayName: () -> ''
@@ -25,6 +27,18 @@ exports.me =
   get: (prop) -> props[prop]
   isOnPremiumServer: () -> false
   freeOnly: -> false
+  isTarena: -> false
+  useTarenaLogo: -> false
+  hideTopRightNav: -> false
+  hideFooter: -> false
+  useGoogleAnalytics: -> true
+  showChinaVideo: -> false
+  getHomePageTestGroup: -> undefined
+  showForumLink: -> true
+  showChinaResourceInfo: -> false
+  hideDiplomatModal: -> false
+  showOpenResourceLink: -> true
+  useStripe: -> true
 
 exports.view =
   forumLink: () -> 'http://discourse.codecombat.com/'

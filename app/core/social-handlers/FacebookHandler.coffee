@@ -13,7 +13,7 @@ userPropsToSave =
 
 module.exports = FacebookHandler = class FacebookHandler extends CocoClass
   constructor: ->
-    if me.onChinaInfra() then throw new Error('No Facebook support in China region.')
+    unless me.useSocialSignOn() then throw new Error('Social single sign on not supported')
     super()
 
   token: -> @authResponse?.accessToken
@@ -70,7 +70,7 @@ module.exports = FacebookHandler = class FacebookHandler extends CocoClass
           channelUrl: document.location.origin + '/channel.html' # Channel File
           cookie: true # enable cookies to allow the server to access the session
           xfbml: true # parse XFBML
-          version: 'v2.8'
+          version: 'v3.2'
         })
         FB.getLoginStatus (response) =>
           if response.status is 'connected'
